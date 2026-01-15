@@ -10,11 +10,13 @@ import com.hypixel.hytale.protocol.packets.interface_.CustomUIEventBindingType;
 import com.hypixel.hytale.protocol.packets.worldmap.MapMarker;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.entity.entities.player.pages.InteractiveCustomUIPage;
+import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
 import com.hypixel.hytale.server.core.ui.builder.EventData;
 import com.hypixel.hytale.server.core.ui.builder.UICommandBuilder;
 import com.hypixel.hytale.server.core.ui.builder.UIEventBuilder;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import com.hypixel.hytale.protocol.Position;
 
 import javax.annotation.Nonnull;
 
@@ -50,16 +52,41 @@ public class WaypointPage extends InteractiveCustomUIPage<WaypointPage.WaypointP
             uiCommandBuilder.appendInline(WAYPOINTS_LIST_REF, "Label { Text: \"No waypoints\"; Anchor: (Height: 40); Style: (FontSize: 14, TextColor: #6e7da1, HorizontalAlignment: Center, VerticalAlignment: Center); }");
         }
 
+        // Get player's current position
+        Player player = store.getComponent(ref, Player.getComponentType());
+        TransformComponent transformComponent = store.getComponent(player.getReference(), TransformComponent.getComponentType());
+        Position playerPosition = transformComponent.getSentTransform().position;
+
+        // Calculate distances and create sorted list
+        java.util.List<WaypointWithDistance> waypointsWithDistance = new java.util.ArrayList<>();
+        for (MapMarker waypoint : waypoints) {
+            Position waypointPosition = waypoint.transform.position;
+            double distance = calculateDistance(playerPosition, waypointPosition);
+            waypointsWithDistance.add(new WaypointWithDistance(waypoint, distance));
+        }
+
+        // Sort by distance (closest first)
+        waypointsWithDistance.sort(java.util.Comparator.comparingDouble(w -> w.distance));
+
         int i = 0;
 
-        for (MapMarker waypoint : waypoints) {
+        for (WaypointWithDistance waypointData : waypointsWithDistance) {
             String selector = "#WaypointsList[" + i + "]";
             uiCommandBuilder.append(WAYPOINTS_LIST_REF, WAYPOINT_ITEM_UI);
 
-            String waypointName = waypoint.name;
-            String waypointId = waypoint.id;
+            String waypointName = waypointData.waypoint.name;
+            String waypointId = waypointData.waypoint.id;
+            String distanceText = String.format("%.1f blocks", waypointData.distance);
 
             uiCommandBuilder.set(selector + " #WaypointName.Text", waypointName);
+            uiCommandBuilder.set(selector + " #WaypointDistance.Text", distanceText);
+
+            uiEventBuilder.addEventBinding(
+                    CustomUIEventBindingType.Activating,
+                    selector + " #EditButton",
+                    new EventData().append("Action", "Edit").append("WaypointId", waypointId),
+                    false
+            );
 
             uiEventBuilder.addEventBinding(
                     CustomUIEventBindingType.Activating,
@@ -78,11 +105,65 @@ public class WaypointPage extends InteractiveCustomUIPage<WaypointPage.WaypointP
         );
     }
 
+    /**
+     * Calculate the Euclidean distance between two positions
+     */
+    private double calculateDistance(Position pos1, Position pos2) {
+        double dx = pos2.x - pos1.x;
+        double dy = pos2.y - pos1.y;
+        double dz = pos2.z - pos1.z;
+        return Math.sqrt(dx * dx + dy * dy + dz * dz);
+    }
+
+    /**
+     * Helper class to store waypoint with its calculated distance
+     */
+    private static class WaypointWithDistance {
+        final MapMarker waypoint;
+        final double distance;
+
+        WaypointWithDistance(MapMarker waypoint, double distance) {
+            this.waypoint = waypoint;
+            this.distance = distance;
+        }
+    }
+
     @Override
     public void handleDataEvent(@Nonnull Ref<EntityStore> ref, @Nonnull Store<EntityStore> store, @Nonnull WaypointPageData data) {
         Player player = store.getComponent(ref, Player.getComponentType());
 
         switch (data.action) {
+            case "Edit":
+                if (data.waypointId != null && !data.waypointId.isEmpty()) {
+                    // Get per-world data
+                    String worldName = player.getWorld().getName();
+                    com.hypixel.hytale.server.core.entity.entities.player.data.PlayerWorldData perWorldData =
+                            player.getPlayerConfigData().getPerWorldData(worldName);
+
+                    MapMarker[] markers = perWorldData.getWorldMapMarkers();
+                    if (markers == null || markers.length == 0) {
+                        player.sendMessage(com.hypixel.hytale.server.core.Message.raw("You don't have any waypoints in this world."));
+                        break;
+                    }
+
+                    // Find the waypoint to edit
+                    MapMarker waypointToEdit = null;
+                    for (MapMarker marker : markers) {
+                        if (marker.id.equals(data.waypointId)) {
+                            waypointToEdit = marker;
+                            break;
+                        }
+                    }
+
+                    if (waypointToEdit == null) {
+                        player.sendMessage(com.hypixel.hytale.server.core.Message.raw("No waypoint was found with that ID."));
+                        break;
+                    }
+
+                    // Open edit page
+                    player.getPageManager().openCustomPage(ref, store, new EditWaypointPage(playerRef, waypointToEdit));
+                }
+                break;
             case "Remove":
                 if (data.waypointId != null && !data.waypointId.isEmpty()) {
                     // Get per-world data

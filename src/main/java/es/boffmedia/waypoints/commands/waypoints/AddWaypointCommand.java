@@ -47,7 +47,7 @@ public class AddWaypointCommand extends AbstractPlayerCommand {
                 new ContextMenuItem("Remove Waypoint", "waypoint remove " + markerName)
         };
 
-        MapMarker playerMarker = new MapMarker(markerName.toLowerCase().replaceAll("\\s+", "_"), markerName, "Spawn.png", transform, items);
+        MapMarker playerMarker = new MapMarker(markerName.toLowerCase().replaceAll("\\s+", "_"), markerName, "Coordinate.png", transform, items);
 
         WorldMapManager.PlayerMarkerReference playerMarkerReference = WorldMapManager.createPlayerMarker(sender.getReference(), playerMarker, store);
 

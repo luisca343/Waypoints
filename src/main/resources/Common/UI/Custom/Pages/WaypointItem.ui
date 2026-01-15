@@ -4,6 +4,12 @@
   Pressed: (Background: #a02020, LabelStyle: (FontSize: 12, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center))
 );
 
+@EditButtonStyle = TextButtonStyle(
+  Default: (Background: #2563eb, LabelStyle: (FontSize: 12, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
+  Hovered: (Background: #3b82f6, LabelStyle: (FontSize: 12, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
+  Pressed: (Background: #1e40af, LabelStyle: (FontSize: 12, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center))
+);
+
 Group {
   LayoutMode: Left;
   Anchor: (Height: 52);
@@ -16,7 +22,20 @@ Group {
     Style: (FontSize: 15, TextColor: #e8eef5, RenderBold: true, VerticalAlignment: Center);
   }
 
+  Label #WaypointDistance {
+    Text: "";
+    Style: (FontSize: 13, TextColor: #8b95a8, VerticalAlignment: Center);
+  }
+
   Group { Anchor: (Width: 12); }
+
+  TextButton #EditButton {
+    Text: "EDIT";
+    Anchor: (Width: 80, Height: 32);
+    Style: @EditButtonStyle;
+  }
+
+  Group { Anchor: (Width: 8); }
 
   TextButton #RemoveButton {
     Text: "REMOVE";

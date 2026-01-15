@@ -119,7 +119,7 @@ public class AddWaypointPage extends InteractiveCustomUIPage<AddWaypointPage.Add
                             new ContextMenuItem("Remove Waypoint", "waypoint remove " + data.name)
                     };
 
-                    MapMarker playerMarker = new MapMarker(waypointId, data.name, "Spawn.png", transform, items);
+                    MapMarker playerMarker = new MapMarker(waypointId, data.name, "Coordinate.png", transform, items);
 
                     WorldMapManager.PlayerMarkerReference playerMarkerReference = WorldMapManager.createPlayerMarker(player.getReference(), playerMarker, store);
 
