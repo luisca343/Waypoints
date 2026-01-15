@@ -10,6 +10,12 @@
   Pressed: (Background: #1e40af, LabelStyle: (FontSize: 12, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center))
 );
 
+@TeleportButtonStyle = TextButtonStyle(
+  Default: (Background: #10b981, LabelStyle: (FontSize: 12, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
+  Hovered: (Background: #34d399, LabelStyle: (FontSize: 12, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
+  Pressed: (Background: #059669, LabelStyle: (FontSize: 12, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center))
+);
+
 Group {
   LayoutMode: Left;
   Anchor: (Height: 52);
@@ -28,6 +34,14 @@ Group {
   }
 
   Group { Anchor: (Width: 12); }
+
+  TextButton #TeleportButton {
+    Text: "TP";
+    Anchor: (Width: 60, Height: 32);
+    Style: @TeleportButtonStyle;
+  }
+
+  Group { Anchor: (Width: 8); }
 
   TextButton #EditButton {
     Text: "EDIT";

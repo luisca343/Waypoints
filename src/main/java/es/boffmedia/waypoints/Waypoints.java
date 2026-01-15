@@ -6,6 +6,7 @@ import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
 import es.boffmedia.waypoints.commands.waypoints.WaypointCommand;
 import es.boffmedia.waypoints.commands.waypoints.ListWaypointsCommand;
 import es.boffmedia.waypoints.commands.waypoints.ResetWaypointsCommand;
+import es.boffmedia.waypoints.commands.waypoints.WaypointTeleportCommand;
 
 import javax.annotation.Nonnull;
 
@@ -28,6 +29,7 @@ public class Waypoints extends JavaPlugin {
         this.getCommandRegistry().registerCommand(new WaypointCommand());
         this.getCommandRegistry().registerCommand(new ResetWaypointsCommand());
         this.getCommandRegistry().registerCommand(new ListWaypointsCommand());
+        this.getCommandRegistry().registerCommand(new WaypointTeleportCommand());
 
     }
 }

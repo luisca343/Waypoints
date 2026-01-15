@@ -5,6 +5,7 @@ import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
+import com.hypixel.hytale.protocol.GameMode;
 import com.hypixel.hytale.protocol.packets.interface_.CustomPageLifetime;
 import com.hypixel.hytale.protocol.packets.interface_.CustomUIEventBindingType;
 import com.hypixel.hytale.protocol.packets.worldmap.MapMarker;
@@ -57,6 +58,10 @@ public class WaypointPage extends InteractiveCustomUIPage<WaypointPage.WaypointP
         TransformComponent transformComponent = store.getComponent(player.getReference(), TransformComponent.getComponentType());
         Position playerPosition = transformComponent.getSentTransform().position;
 
+        // Check if player can teleport (has permission or is in creative)
+        boolean canTeleport = player.hasPermission("waypoints.teleport")
+                || player.getGameMode() == GameMode.Creative;
+
         // Calculate distances and create sorted list
         java.util.List<WaypointWithDistance> waypointsWithDistance = new java.util.ArrayList<>();
         for (MapMarker waypoint : waypoints) {
@@ -80,6 +85,18 @@ public class WaypointPage extends InteractiveCustomUIPage<WaypointPage.WaypointP
 
             uiCommandBuilder.set(selector + " #WaypointName.Text", waypointName);
             uiCommandBuilder.set(selector + " #WaypointDistance.Text", distanceText);
+
+            // Show/hide TP button based on permission
+            uiCommandBuilder.set(selector + " #TeleportButton.Visible", canTeleport);
+
+            if (canTeleport) {
+                uiEventBuilder.addEventBinding(
+                        CustomUIEventBindingType.Activating,
+                        selector + " #TeleportButton",
+                        new EventData().append("Action", "Teleport").append("WaypointId", waypointId),
+                        false
+                );
+            }
 
             uiEventBuilder.addEventBinding(
                     CustomUIEventBindingType.Activating,
@@ -133,6 +150,46 @@ public class WaypointPage extends InteractiveCustomUIPage<WaypointPage.WaypointP
         Player player = store.getComponent(ref, Player.getComponentType());
 
         switch (data.action) {
+            case "Teleport":
+                if (data.waypointId != null && !data.waypointId.isEmpty()) {
+                    // Get per-world data
+                    String worldName = player.getWorld().getName();
+                    com.hypixel.hytale.server.core.entity.entities.player.data.PlayerWorldData perWorldData =
+                            player.getPlayerConfigData().getPerWorldData(worldName);
+
+                    MapMarker[] markers = perWorldData.getWorldMapMarkers();
+                    if (markers == null || markers.length == 0) {
+                        player.sendMessage(com.hypixel.hytale.server.core.Message.raw("You don't have any waypoints in this world."));
+                        break;
+                    }
+
+                    // Find the waypoint to teleport to
+                    MapMarker waypoint = null;
+                    for (MapMarker marker : markers) {
+                        if (marker.id.equals(data.waypointId)) {
+                            waypoint = marker;
+                            break;
+                        }
+                    }
+
+                    if (waypoint == null) {
+                        player.sendMessage(com.hypixel.hytale.server.core.Message.raw("No waypoint was found with that ID."));
+                        break;
+                    }
+
+                    // Teleport to waypoint
+                    com.hypixel.hytale.math.vector.Vector3d targetPos = new com.hypixel.hytale.math.vector.Vector3d(
+                            waypoint.transform.position.x,
+                            waypoint.transform.position.y,
+                            waypoint.transform.position.z
+                    );
+                    com.hypixel.hytale.math.vector.Vector3f rotation = new com.hypixel.hytale.math.vector.Vector3f(0.0F, 0.0F, 0.0F);
+                    com.hypixel.hytale.server.core.modules.entity.teleport.Teleport teleport = new com.hypixel.hytale.server.core.modules.entity.teleport.Teleport(targetPos, rotation);
+                    store.addComponent(ref, com.hypixel.hytale.server.core.modules.entity.teleport.Teleport.getComponentType(), teleport);
+
+                    player.sendMessage(com.hypixel.hytale.server.core.Message.raw("Teleported to '" + waypoint.name + "'!"));
+                }
+                break;
             case "Edit":
                 if (data.waypointId != null && !data.waypointId.isEmpty()) {
                     // Get per-world data
