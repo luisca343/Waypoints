@@ -1,0 +1,22 @@
+{
+    "Group": "Boffmedia",
+    "Name": "Waypoints",
+    "Version": "0.0.1",
+    "Description": "Waypoints",
+    "Authors": [
+        {
+            "Name": "Luisca"
+        }
+    ],
+    "Website": "boffmedia.es",
+    "ServerVersion": "*",
+    "Dependencies": {
+        
+    },
+    "OptionalDependencies": {
+        
+    },
+    "DisabledByDefault": false,
+    "Main": "es.boffmedia.waypoints.Waypoints",
+    "IncludesAssetPack": true
+}

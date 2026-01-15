@@ -1,0 +1,26 @@
+@RemoveButtonStyle = TextButtonStyle(
+  Default: (Background: #c53030, LabelStyle: (FontSize: 12, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
+  Hovered: (Background: #dc3545, LabelStyle: (FontSize: 12, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
+  Pressed: (Background: #a02020, LabelStyle: (FontSize: 12, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center))
+);
+
+Group {
+  LayoutMode: Left;
+  Anchor: (Height: 52);
+  Background: #1e2836(0.9);
+  Padding: (Left: 16, Right: 16, Top: 10, Bottom: 10);
+
+  Label #WaypointName {
+    Text: "WaypointName";
+    FlexWeight: 1;
+    Style: (FontSize: 15, TextColor: #e8eef5, RenderBold: true, VerticalAlignment: Center);
+  }
+
+  Group { Anchor: (Width: 12); }
+
+  TextButton #RemoveButton {
+    Text: "REMOVE";
+    Anchor: (Width: 90, Height: 32);
+    Style: @RemoveButtonStyle;
+  }
+}
