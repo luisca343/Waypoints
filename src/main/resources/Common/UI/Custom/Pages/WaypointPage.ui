@@ -1,8 +1,4 @@
-@CreateButtonStyle = TextButtonStyle(
-  Default: (Background: #3a7bd5, LabelStyle: (FontSize: 14, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
-  Hovered: (Background: #4a8be5, LabelStyle: (FontSize: 14, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
-  Pressed: (Background: #2a6bc5, LabelStyle: (FontSize: 14, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center))
-);
+$C = "../Common.ui";
 
 Group {
     Anchor: (Width: 650, Height: 450);
@@ -39,6 +35,6 @@ Group {
     TextButton #CreateWaypointButton {
         Text: "CREATE WAYPOINT";
         Anchor: (Height: 44);
-        Style: @CreateButtonStyle;
+        Style: $C.@DefaultTextButtonStyle;
     }
 }

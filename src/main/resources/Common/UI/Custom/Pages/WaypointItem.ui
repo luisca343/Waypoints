@@ -1,21 +1,3 @@
-@RemoveButtonStyle = TextButtonStyle(
-  Default: (Background: #c53030, LabelStyle: (FontSize: 12, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
-  Hovered: (Background: #dc3545, LabelStyle: (FontSize: 12, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
-  Pressed: (Background: #a02020, LabelStyle: (FontSize: 12, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center))
-);
-
-@EditButtonStyle = TextButtonStyle(
-  Default: (Background: #2563eb, LabelStyle: (FontSize: 12, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
-  Hovered: (Background: #3b82f6, LabelStyle: (FontSize: 12, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
-  Pressed: (Background: #1e40af, LabelStyle: (FontSize: 12, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center))
-);
-
-@TeleportButtonStyle = TextButtonStyle(
-  Default: (Background: #10b981, LabelStyle: (FontSize: 12, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
-  Hovered: (Background: #34d399, LabelStyle: (FontSize: 12, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
-  Pressed: (Background: #059669, LabelStyle: (FontSize: 12, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center))
-);
-
 $C = "../Common.ui";
 
 Group {
@@ -41,27 +23,27 @@ Group {
     }
   }
 
-  Group { Anchor: (Width: 12); }
+  Group { Anchor: (Width: 16); }
 
   TextButton #TeleportButton {
     Text: "TP";
-    Anchor: (Width: 60, Height: 44);
-    Style: @TeleportButtonStyle;
+    Anchor: (Width: 50, Height: 38);
+    Style: $C.@TertiaryTextButtonStyle;
   }
 
-  Group { Anchor: (Width: 8); }
+  Group { Anchor: (Width: 12); }
 
   TextButton #EditButton {
     Text: "EDIT";
-    Anchor: (Width: 80, Height: 44);
-    Style: @EditButtonStyle;
+    Anchor: (Width: 70, Height: 38);
+    Style: $C.@SecondaryTextButtonStyle;
   }
 
-  Group { Anchor: (Width: 8); }
+  Group { Anchor: (Width: 12); }
 
   TextButton #RemoveButton {
     Text: "REMOVE";
-    Anchor: (Width: 90, Height: 44);
-    Style: @RemoveButtonStyle;
+    Anchor: (Width: 90, Height: 38);
+    Style: $C.@CancelTextButtonStyle;
   }
 }
