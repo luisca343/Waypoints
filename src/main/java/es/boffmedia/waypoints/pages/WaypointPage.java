@@ -9,6 +9,7 @@ import com.hypixel.hytale.protocol.GameMode;
 import com.hypixel.hytale.protocol.packets.interface_.CustomPageLifetime;
 import com.hypixel.hytale.protocol.packets.interface_.CustomUIEventBindingType;
 import com.hypixel.hytale.protocol.packets.worldmap.MapMarker;
+import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.entity.entities.player.pages.InteractiveCustomUIPage;
 import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
@@ -18,6 +19,7 @@ import com.hypixel.hytale.server.core.ui.builder.UIEventBuilder;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.protocol.Position;
+import es.boffmedia.waypoints.Constants;
 
 import javax.annotation.Nonnull;
 
@@ -76,15 +78,23 @@ public class WaypointPage extends InteractiveCustomUIPage<WaypointPage.WaypointP
         int i = 0;
 
         for (WaypointWithDistance waypointData : waypointsWithDistance) {
+            System.out.println("Processing waypoint: " + waypointData.waypoint.name);
+
             String selector = "#WaypointsList[" + i + "]";
             uiCommandBuilder.append(WAYPOINTS_LIST_REF, WAYPOINT_ITEM_UI);
 
             String waypointName = waypointData.waypoint.name;
             String waypointId = waypointData.waypoint.id;
-            String distanceText = String.format("%.1f blocks", waypointData.distance);
+            String waypointIcon = waypointData.waypoint.markerImage;
+            Position waypointPos = waypointData.waypoint.transform.position;
+            String coordinatesText = String.format("X: %.0f  Y: %.0f  Z: %.0f  -  %.1f blocks away", 
+                waypointPos.x, waypointPos.y, waypointPos.z, waypointData.distance);
 
             uiCommandBuilder.set(selector + " #WaypointName.Text", waypointName);
-            uiCommandBuilder.set(selector + " #WaypointDistance.Text", distanceText);
+            uiCommandBuilder.set(selector + " #WaypointCoordinates.Text", coordinatesText);
+            //uiCommandBuilder.set(selector + " #WaypointIcon.Background.TexturePath", Constants.ICON_PATH_PREFIX + waypointIcon);
+
+            System.out.println("Waypoint: " + waypointName + " at " + coordinatesText + " with icon " +  Constants.ICON_PATH_PREFIX + waypointIcon);
 
             // Show/hide TP button based on permission
             uiCommandBuilder.set(selector + " #TeleportButton.Visible", canTeleport);

@@ -1,0 +1,18 @@
+$C = "../Common.ui";
+
+@IconButtonStyle = TextButtonStyle(
+  Default: (Background: #1e2836(0.9), LabelStyle: (FontSize: 14, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
+  Hovered: (Background: #2a3a4a(0.95), LabelStyle: (FontSize: 14, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
+  Pressed: (Background: #0f1621, LabelStyle: (FontSize: 14, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center))
+);
+
+Group {
+  LayoutMode: Top;
+  Anchor: (Width: 120);
+
+  TextButton #IconButton {
+    Text: "Icon";
+    Anchor: (Height: 50);
+    Style: @IconButtonStyle;
+  }
+}

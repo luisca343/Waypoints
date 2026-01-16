@@ -16,28 +16,36 @@
   Pressed: (Background: #059669, LabelStyle: (FontSize: 12, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center))
 );
 
+$C = "../Common.ui";
+
 Group {
   LayoutMode: Left;
-  Anchor: (Height: 52);
+  Anchor: (Height: 64);
   Background: #1e2836(0.9);
   Padding: (Left: 16, Right: 16, Top: 10, Bottom: 10);
 
-  Label #WaypointName {
-    Text: "WaypointName";
+  Group {
     FlexWeight: 1;
-    Style: (FontSize: 15, TextColor: #e8eef5, RenderBold: true, VerticalAlignment: Center);
-  }
+    LayoutMode: Top;
 
-  Label #WaypointDistance {
-    Text: "";
-    Style: (FontSize: 13, TextColor: #8b95a8, VerticalAlignment: Center);
+    Label #WaypointName {
+      Text: "WaypointName";
+      Anchor: (Height: 22);
+      Style: (FontSize: 16, TextColor: #ffffff, RenderBold: true, VerticalAlignment: Center);
+    }
+
+    Label #WaypointCoordinates {
+      Text: "";
+      Anchor: (Height: 18);
+      Style: (FontSize: 12, TextColor: #8b95a8, VerticalAlignment: Center);
+    }
   }
 
   Group { Anchor: (Width: 12); }
 
   TextButton #TeleportButton {
     Text: "TP";
-    Anchor: (Width: 60, Height: 32);
+    Anchor: (Width: 60, Height: 44);
     Style: @TeleportButtonStyle;
   }
 
@@ -45,7 +53,7 @@ Group {
 
   TextButton #EditButton {
     Text: "EDIT";
-    Anchor: (Width: 80, Height: 32);
+    Anchor: (Width: 80, Height: 44);
     Style: @EditButtonStyle;
   }
 
@@ -53,7 +61,7 @@ Group {
 
   TextButton #RemoveButton {
     Text: "REMOVE";
-    Anchor: (Width: 90, Height: 32);
+    Anchor: (Width: 90, Height: 44);
     Style: @RemoveButtonStyle;
   }
 }
