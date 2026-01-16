@@ -2,7 +2,8 @@
 
 A waypoint management system for Hytale with an in-game UI.
 
-![Waypoints main view](https://i.imgur.com/rNahvoh.png)
+![Compass](https://i.imgur.com/4CCCdaT.png)
+![Waypoints main view](https://i.imgur.com/CTiDetR.jpeg)
 
 ## Features
 
@@ -27,7 +28,7 @@ Each waypoint shows three buttons:
 - **EDIT** (blue) - Modify waypoint
 - **REMOVE** (red) - Delete waypoint
 
-![Waypoint add view](https://i.imgur.com/sS7UDU9.png)
+![Waypoint add view](https://i.imgur.com/P0JaMMQ.jpeg)
 
 ## Permissions
 
@@ -46,7 +47,7 @@ Each waypoint shows three buttons:
 
 ## TODO
 
-- Add different marker types
+- Allow users to add their own icons
 - Translations
 
 
