@@ -1,0 +1,40 @@
+$C = "../Common.ui";
+
+Group {
+  Anchor: (Width: 500, Height: 450);
+  Background: #1a1a2e(0.96);
+  LayoutMode: Top;
+  Padding: (Full: 24);
+
+  Label #Title {
+    Text: "CHOOSE ICON";
+    Anchor: (Height: 44);
+    Style: (FontSize: 22, TextColor: #ffffff, HorizontalAlignment: Center, RenderBold: true);
+  }
+
+  Group { Anchor: (Height: 2); Background: #3a7bd5; }
+  Group { Anchor: (Height: 20); }
+
+  Group #IconList {
+    FlexWeight: 1;
+    LayoutMode: TopScrolling;
+    Background: #0f1621(0.7);
+    Padding: (Full: 8);
+    ScrollbarStyle: (
+      Spacing: 6,
+      Size: 6,
+      Background: (TexturePath: "Common/Scrollbar.png", Border: 3),
+      Handle: (TexturePath: "Common/ScrollbarHandle.png", Border: 3),
+      HoveredHandle: (TexturePath: "Common/ScrollbarHandleHovered.png", Border: 3),
+      DraggedHandle: (TexturePath: "Common/ScrollbarHandleDragged.png", Border: 3)
+    );
+  }
+
+  Group { Anchor: (Height: 20); }
+
+  TextButton #BackButton {
+    Text: "BACK";
+    Anchor: (Height: 44);
+    Style: $C.@SecondaryTextButtonStyle;
+  }
+}

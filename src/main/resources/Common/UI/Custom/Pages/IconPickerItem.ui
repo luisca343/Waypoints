@@ -1,0 +1,21 @@
+$C = "../Common.ui";
+
+Group {
+  LayoutMode: Left;
+  Anchor: (Height: 50);
+  Background: #1e2836(0.9);
+  Padding: (Full: 8);
+
+  Group #IconContainer {
+    Anchor: (Width: 44, Height: 44);
+  }
+
+  Group { Anchor: (Width: 12); }
+
+  TextButton #IconButton {
+    Text: "Icon Name";
+    FlexWeight: 1;
+    Anchor: (Height: 44);
+    Style: $C.@DefaultTextButtonStyle;
+  }
+}

@@ -34,6 +34,7 @@ import javax.annotation.Nonnull;
 public class AddWaypointPage extends InteractiveCustomUIPage<AddWaypointPage.AddWaypointPageData> {
 
     private String selectedIcon = "Coordinate.png";
+    private String selectedIconDisplayName = "Coordinate";
 
     public static class AddWaypointPageData {
         public String action;
@@ -41,7 +42,6 @@ public class AddWaypointPage extends InteractiveCustomUIPage<AddWaypointPage.Add
         public String x;
         public String y;
         public String z;
-        public String selectedEntry;
 
         public static final BuilderCodec<AddWaypointPageData> CODEC = ((BuilderCodec.Builder<AddWaypointPageData>) ((BuilderCodec.Builder<AddWaypointPageData>)
                 ((BuilderCodec.Builder<AddWaypointPageData>) ((BuilderCodec.Builder<AddWaypointPageData>)
@@ -56,9 +56,7 @@ public class AddWaypointPage extends InteractiveCustomUIPage<AddWaypointPage.Add
                 .append(new KeyedCodec<>("@Y", Codec.STRING), (AddWaypointPageData o, String v) -> o.y = v, (AddWaypointPageData o) -> o.y)
                 .add())
                 .append(new KeyedCodec<>("@Z", Codec.STRING), (AddWaypointPageData o, String v) -> o.z = v, (AddWaypointPageData o) -> o.z)
-                .add())
-                .append(new KeyedCodec<>("@SelectedEntry", Codec.STRING), (AddWaypointPageData o, String v) -> o.selectedEntry = v, (AddWaypointPageData o) -> o.selectedEntry)
-                .add())
+                .add()))
                 .build();
     }
 
@@ -68,14 +66,18 @@ public class AddWaypointPage extends InteractiveCustomUIPage<AddWaypointPage.Add
 
     public void setSelectedIcon(String iconFileName) {
         this.selectedIcon = iconFileName;
+        // Update display name based on filename
+        for (Icons.Icon icon : Icons.getDefaultIcons()) {
+            if (icon.getFileName().equals(iconFileName)) {
+                this.selectedIconDisplayName = icon.getDisplayName();
+                break;
+            }
+        }
     }
 
     @Override
     public void build(@Nonnull Ref<EntityStore> ref, @Nonnull UICommandBuilder uiCommandBuilder, @Nonnull UIEventBuilder uiEventBuilder, @Nonnull Store<EntityStore> store) {
         uiCommandBuilder.append("Pages/AddWaypointPage.ui");
-
-        // Add icon dropdown field
-        uiCommandBuilder.append("#IconDropdownContainer", "Pages/IconDropdownField.ui");
 
         // Get player's current position to pre-fill coordinates
         Player player = store.getComponent(ref, Player.getComponentType());
@@ -87,8 +89,16 @@ public class AddWaypointPage extends InteractiveCustomUIPage<AddWaypointPage.Add
         uiCommandBuilder.set("#YInput.Value", String.format("%.2f", position.y));
         uiCommandBuilder.set("#ZInput.Value", String.format("%.2f", position.z));
 
-        // Populate icon dropdown
-        UIHelpers.populateIconDropdown(uiCommandBuilder, selectedIcon);
+        // Set selected icon display name
+        uiCommandBuilder.set("#SelectedIconLabel.Text", selectedIconDisplayName);
+
+        // Add event binding for Choose Icon button
+        uiEventBuilder.addEventBinding(
+                CustomUIEventBindingType.Activating,
+                "#ChooseIconButton",
+                new EventData().append("Action", "ChooseIcon"),
+                false
+        );
 
         // Add event binding for Add button
         uiEventBuilder.addEventBinding(
@@ -99,8 +109,7 @@ public class AddWaypointPage extends InteractiveCustomUIPage<AddWaypointPage.Add
                         .append("@Name", "#WaypointNameInput.Value")
                         .append("@X", "#XInput.Value")
                         .append("@Y", "#YInput.Value")
-                        .append("@Z", "#ZInput.Value")
-                        .append("@SelectedEntry", "#IconDropdown.Value"),
+                        .append("@Z", "#ZInput.Value"),
                 false
         );
 
@@ -118,17 +127,13 @@ public class AddWaypointPage extends InteractiveCustomUIPage<AddWaypointPage.Add
         Player player = store.getComponent(ref, Player.getComponentType());
 
         switch (data.action) {
+            case "ChooseIcon":
+                // Open icon picker page
+                IconPickerPage iconPickerPage = new IconPickerPage(playerRef, selectedIcon, this);
+                player.getPageManager().openCustomPage(ref, store, iconPickerPage);
+                break;
+
             case "Add":
-                // Extract icon from selectedEntry
-                if (data.selectedEntry != null && !data.selectedEntry.isEmpty()) {
-                    String iconPath = data.selectedEntry;
-                    if (iconPath.startsWith(Constants.ICON_PATH_PREFIX)) {
-                        selectedIcon = iconPath.substring(Constants.ICON_PATH_PREFIX.length());
-                    } else {
-                        selectedIcon = iconPath;
-                    }
-                }
-                
                 if (data.name == null || data.name.trim().isEmpty()) {
                     player.sendMessage(Message.raw("Error: Waypoint name cannot be empty."));
                     return;
