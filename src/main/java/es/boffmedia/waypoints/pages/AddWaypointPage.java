@@ -35,6 +35,10 @@ public class AddWaypointPage extends InteractiveCustomUIPage<AddWaypointPage.Add
 
     private String selectedIcon = "Coordinate.png";
     private String selectedIconDisplayName = "Coordinate";
+    private String savedName = null;
+    private String savedX = null;
+    private String savedY = null;
+    private String savedZ = null;
 
     public static class AddWaypointPageData {
         public String action;
@@ -84,10 +88,13 @@ public class AddWaypointPage extends InteractiveCustomUIPage<AddWaypointPage.Add
         TransformComponent transformComponent = store.getComponent(player.getReference(), TransformComponent.getComponentType());
         Position position = transformComponent.getSentTransform().position;
 
-        // Set default coordinates to player's current position
-        uiCommandBuilder.set("#XInput.Value", String.format("%.2f", position.x));
-        uiCommandBuilder.set("#YInput.Value", String.format("%.2f", position.y));
-        uiCommandBuilder.set("#ZInput.Value", String.format("%.2f", position.z));
+        // Set form values - use saved values if they exist, otherwise use defaults
+        if (savedName != null) {
+            uiCommandBuilder.set("#WaypointNameInput.Value", savedName);
+        }
+        uiCommandBuilder.set("#XInput.Value", savedX != null ? savedX : String.format("%.2f", position.x));
+        uiCommandBuilder.set("#YInput.Value", savedY != null ? savedY : String.format("%.2f", position.y));
+        uiCommandBuilder.set("#ZInput.Value", savedZ != null ? savedZ : String.format("%.2f", position.z));
 
         // Set selected icon display name
         uiCommandBuilder.set("#SelectedIconLabel.Text", selectedIconDisplayName);
@@ -96,7 +103,12 @@ public class AddWaypointPage extends InteractiveCustomUIPage<AddWaypointPage.Add
         uiEventBuilder.addEventBinding(
                 CustomUIEventBindingType.Activating,
                 "#ChooseIconButton",
-                new EventData().append("Action", "ChooseIcon"),
+                new EventData()
+                        .append("Action", "ChooseIcon")
+                        .append("@Name", "#WaypointNameInput.Value")
+                        .append("@X", "#XInput.Value")
+                        .append("@Y", "#YInput.Value")
+                        .append("@Z", "#ZInput.Value"),
                 false
         );
 
@@ -128,6 +140,12 @@ public class AddWaypointPage extends InteractiveCustomUIPage<AddWaypointPage.Add
 
         switch (data.action) {
             case "ChooseIcon":
+                // Save current form values before opening icon picker
+                savedName = data.name;
+                savedX = data.x;
+                savedY = data.y;
+                savedZ = data.z;
+                
                 // Open icon picker page
                 IconPickerPage iconPickerPage = new IconPickerPage(playerRef, selectedIcon, this);
                 player.getPageManager().openCustomPage(ref, store, iconPickerPage);

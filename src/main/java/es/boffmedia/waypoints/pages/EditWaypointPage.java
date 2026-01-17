@@ -33,6 +33,10 @@ public class EditWaypointPage extends InteractiveCustomUIPage<EditWaypointPage.E
     private final MapMarker waypoint;
     private String selectedIcon;
     private String selectedIconDisplayName;
+    private String savedName = null;
+    private String savedX = null;
+    private String savedY = null;
+    private String savedZ = null;
 
     public static class EditWaypointPageData {
         public String action;
@@ -87,13 +91,13 @@ public class EditWaypointPage extends InteractiveCustomUIPage<EditWaypointPage.E
     public void build(@Nonnull Ref<EntityStore> ref, @Nonnull UICommandBuilder uiCommandBuilder, @Nonnull UIEventBuilder uiEventBuilder, @Nonnull Store<EntityStore> store) {
         uiCommandBuilder.append("Pages/EditWaypointPage.ui");
 
-        // Pre-fill with current waypoint data
+        // Pre-fill with current waypoint data or saved values
         Position position = waypoint.transform.position;
 
-        uiCommandBuilder.set("#WaypointNameInput.Value", waypoint.name);
-        uiCommandBuilder.set("#XInput.Value", String.format("%.2f", position.x));
-        uiCommandBuilder.set("#YInput.Value", String.format("%.2f", position.y));
-        uiCommandBuilder.set("#ZInput.Value", String.format("%.2f", position.z));
+        uiCommandBuilder.set("#WaypointNameInput.Value", savedName != null ? savedName : waypoint.name);
+        uiCommandBuilder.set("#XInput.Value", savedX != null ? savedX : String.format("%.2f", position.x));
+        uiCommandBuilder.set("#YInput.Value", savedY != null ? savedY : String.format("%.2f", position.y));
+        uiCommandBuilder.set("#ZInput.Value", savedZ != null ? savedZ : String.format("%.2f", position.z));
 
         // Set selected icon display name
         uiCommandBuilder.set("#SelectedIconLabel.Text", selectedIconDisplayName);
@@ -102,7 +106,12 @@ public class EditWaypointPage extends InteractiveCustomUIPage<EditWaypointPage.E
         uiEventBuilder.addEventBinding(
                 CustomUIEventBindingType.Activating,
                 "#ChooseIconButton",
-                new EventData().append("Action", "ChooseIcon"),
+                new EventData()
+                        .append("Action", "ChooseIcon")
+                        .append("@Name", "#WaypointNameInput.Value")
+                        .append("@X", "#XInput.Value")
+                        .append("@Y", "#YInput.Value")
+                        .append("@Z", "#ZInput.Value"),
                 false
         );
 
@@ -134,6 +143,12 @@ public class EditWaypointPage extends InteractiveCustomUIPage<EditWaypointPage.E
 
         switch (data.action) {
             case "ChooseIcon":
+                // Save current form values before opening icon picker
+                savedName = data.name;
+                savedX = data.x;
+                savedY = data.y;
+                savedZ = data.z;
+                
                 // Open icon picker page
                 IconPickerPage iconPickerPage = new IconPickerPage(playerRef, selectedIcon, this);
                 player.getPageManager().openCustomPage(ref, store, iconPickerPage);
