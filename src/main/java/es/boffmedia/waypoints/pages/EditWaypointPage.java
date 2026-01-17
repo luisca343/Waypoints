@@ -24,6 +24,7 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.core.ui.DropdownEntryInfo;
 import es.boffmedia.waypoints.Constants;
 import es.boffmedia.waypoints.Icons;
+import es.boffmedia.waypoints.util.UIHelpers;
 
 import javax.annotation.Nonnull;
 
@@ -31,6 +32,11 @@ public class EditWaypointPage extends InteractiveCustomUIPage<EditWaypointPage.E
 
     private final MapMarker waypoint;
     private String selectedIcon;
+    private String selectedIconDisplayName;
+    private String savedName = null;
+    private String savedX = null;
+    private String savedY = null;
+    private String savedZ = null;
 
     public static class EditWaypointPageData {
         public String action;
@@ -38,7 +44,6 @@ public class EditWaypointPage extends InteractiveCustomUIPage<EditWaypointPage.E
         public String x;
         public String y;
         public String z;
-        public String selectedEntry;
 
         public static final BuilderCodec<EditWaypointPageData> CODEC = ((BuilderCodec.Builder<EditWaypointPageData>) ((BuilderCodec.Builder<EditWaypointPageData>)
                 ((BuilderCodec.Builder<EditWaypointPageData>) ((BuilderCodec.Builder<EditWaypointPageData>)
@@ -53,9 +58,7 @@ public class EditWaypointPage extends InteractiveCustomUIPage<EditWaypointPage.E
                 .append(new KeyedCodec<>("@Y", Codec.STRING), (EditWaypointPageData o, String v) -> o.y = v, (EditWaypointPageData o) -> o.y)
                 .add())
                 .append(new KeyedCodec<>("@Z", Codec.STRING), (EditWaypointPageData o, String v) -> o.z = v, (EditWaypointPageData o) -> o.z)
-                .add())
-                .append(new KeyedCodec<>("@SelectedEntry", Codec.STRING), (EditWaypointPageData o, String v) -> o.selectedEntry = v, (EditWaypointPageData o) -> o.selectedEntry)
-                .add())
+                .add()))
                 .build();
     }
 
@@ -63,38 +66,54 @@ public class EditWaypointPage extends InteractiveCustomUIPage<EditWaypointPage.E
         super(playerRef, CustomPageLifetime.CanDismiss, EditWaypointPageData.CODEC);
         this.waypoint = waypoint;
         this.selectedIcon = waypoint.markerImage;
+        // Find display name for current icon
+        this.selectedIconDisplayName = "Unknown";
+        for (Icons.Icon icon : Icons.getDefaultIcons()) {
+            if (icon.getFileName().equals(waypoint.markerImage)) {
+                this.selectedIconDisplayName = icon.getDisplayName();
+                break;
+            }
+        }
     }
 
     public void setSelectedIcon(String iconFileName) {
         this.selectedIcon = iconFileName;
+        // Update display name based on filename
+        for (Icons.Icon icon : Icons.getDefaultIcons()) {
+            if (icon.getFileName().equals(iconFileName)) {
+                this.selectedIconDisplayName = icon.getDisplayName();
+                break;
+            }
+        }
     }
 
     @Override
     public void build(@Nonnull Ref<EntityStore> ref, @Nonnull UICommandBuilder uiCommandBuilder, @Nonnull UIEventBuilder uiEventBuilder, @Nonnull Store<EntityStore> store) {
         uiCommandBuilder.append("Pages/EditWaypointPage.ui");
 
-        // Pre-fill with current waypoint data
+        // Pre-fill with current waypoint data or saved values
         Position position = waypoint.transform.position;
 
-        uiCommandBuilder.set("#WaypointNameInput.Value", waypoint.name);
-        uiCommandBuilder.set("#XInput.Value", String.format("%.2f", position.x));
-        uiCommandBuilder.set("#YInput.Value", String.format("%.2f", position.y));
-        uiCommandBuilder.set("#ZInput.Value", String.format("%.2f", position.z));
+        uiCommandBuilder.set("#WaypointNameInput.Value", savedName != null ? savedName : waypoint.name);
+        uiCommandBuilder.set("#XInput.Value", savedX != null ? savedX : String.format("%.2f", position.x));
+        uiCommandBuilder.set("#YInput.Value", savedY != null ? savedY : String.format("%.2f", position.y));
+        uiCommandBuilder.set("#ZInput.Value", savedZ != null ? savedZ : String.format("%.2f", position.z));
 
-        // Populate icon dropdown
-        java.util.List<Icons.Icon> icons = Icons.getDefaultIcons();
-        DropdownEntryInfo[] iconEntries = new DropdownEntryInfo[icons.size()];
-        int selectedIndex = 0;
-        for (int i = 0; i < icons.size(); i++) {
-            Icons.Icon icon = icons.get(i);
-            iconEntries[i] = new DropdownEntryInfo(LocalizableString.fromString(icon.getDisplayName()), Constants.ICON_PATH_PREFIX + icon.getFileName());
-            if (icon.getFileName().equals(selectedIcon)) {
-                selectedIndex = i;
-            }
-        }
-        uiCommandBuilder.set("#IconDropdown.Entries", iconEntries);
-        // Set initial dropdown value based on current waypoint icon
-        uiCommandBuilder.set("#IconDropdown.Value", Constants.ICON_PATH_PREFIX + selectedIcon);
+        // Set selected icon display name
+        uiCommandBuilder.set("#SelectedIconLabel.Text", selectedIconDisplayName);
+
+        // Add event binding for Choose Icon button
+        uiEventBuilder.addEventBinding(
+                CustomUIEventBindingType.Activating,
+                "#ChooseIconButton",
+                new EventData()
+                        .append("Action", "ChooseIcon")
+                        .append("@Name", "#WaypointNameInput.Value")
+                        .append("@X", "#XInput.Value")
+                        .append("@Y", "#YInput.Value")
+                        .append("@Z", "#ZInput.Value"),
+                false
+        );
 
         // Add event binding for Save button
         uiEventBuilder.addEventBinding(
@@ -105,8 +124,7 @@ public class EditWaypointPage extends InteractiveCustomUIPage<EditWaypointPage.E
                         .append("@Name", "#WaypointNameInput.Value")
                         .append("@X", "#XInput.Value")
                         .append("@Y", "#YInput.Value")
-                        .append("@Z", "#ZInput.Value")
-                        .append("@SelectedEntry", "#IconDropdown.Value"),
+                        .append("@Z", "#ZInput.Value"),
                 false
         );
 
@@ -124,17 +142,19 @@ public class EditWaypointPage extends InteractiveCustomUIPage<EditWaypointPage.E
         Player player = store.getComponent(ref, Player.getComponentType());
 
         switch (data.action) {
-            case "Save":
-                // Extract icon from selectedEntry
-                if (data.selectedEntry != null && !data.selectedEntry.isEmpty()) {
-                    String iconPath = data.selectedEntry;
-                    if (iconPath.startsWith(Constants.ICON_PATH_PREFIX)) {
-                        selectedIcon = iconPath.substring(Constants.ICON_PATH_PREFIX.length());
-                    } else {
-                        selectedIcon = iconPath;
-                    }
-                }
+            case "ChooseIcon":
+                // Save current form values before opening icon picker
+                savedName = data.name;
+                savedX = data.x;
+                savedY = data.y;
+                savedZ = data.z;
                 
+                // Open icon picker page
+                IconPickerPage iconPickerPage = new IconPickerPage(playerRef, selectedIcon, this);
+                player.getPageManager().openCustomPage(ref, store, iconPickerPage);
+                break;
+
+            case "Save":
                 if (data.name == null || data.name.trim().isEmpty()) {
                     player.sendMessage(Message.raw("Error: Waypoint name cannot be empty."));
                     return;

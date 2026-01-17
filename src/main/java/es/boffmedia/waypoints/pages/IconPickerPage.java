@@ -23,10 +23,8 @@ public class IconPickerPage extends InteractiveCustomUIPage<IconPickerPage.IconP
     
     private final InteractiveCustomUIPage<?> returnPage;
     private final String currentIcon;
-    private final String ICON_GRID_REF = "#IconGrid";
-    private final String ICON_GRID_ROW_UI = "Pages/IconGridRow.ui";
+    private final String ICON_LIST_REF = "#IconList";
     private final String ICON_PICKER_ITEM_UI = "Pages/IconPickerItem.ui";
-    private final String ICON_SPACER_UI = "Pages/IconSpacer.ui";
     
     public static class IconPickerPageData {
         public String action;
@@ -50,51 +48,34 @@ public class IconPickerPage extends InteractiveCustomUIPage<IconPickerPage.IconP
     @Override
     public void build(@Nonnull Ref<EntityStore> ref, @Nonnull UICommandBuilder uiCommandBuilder, @Nonnull UIEventBuilder uiEventBuilder, @Nonnull Store<EntityStore> store) {
         uiCommandBuilder.append("Pages/IconPickerPage.ui");
-        uiCommandBuilder.clear(ICON_GRID_REF);
+        uiCommandBuilder.clear(ICON_LIST_REF);
 
-        // Create a grid layout container
+        // Add all icons as simple list items
         java.util.List<Icons.Icon> icons = Icons.getDefaultIcons();
-        int iconsPerRow = 6;
-        int totalIcons = icons.size();
-        int rows = (int) Math.ceil((double) totalIcons / iconsPerRow);
-
-        for (int row = 0; row < rows; row++) {
-            String rowSelector = ICON_GRID_REF + "[" + row + "]";
+        
+        for (int i = 0; i < icons.size(); i++) {
+            Icons.Icon icon = icons.get(i);
+            String iconSelector = ICON_LIST_REF + "[" + i + "]";
             
-            // Create a row container
-            uiCommandBuilder.append(ICON_GRID_REF, ICON_GRID_ROW_UI);
-
-            for (int col = 0; col < iconsPerRow; col++) {
-                int iconIndex = row * iconsPerRow + col;
-                if (iconIndex >= totalIcons) break;
-
-                Icons.Icon icon = icons.get(iconIndex);
-                String iconSelector = rowSelector + "[" + col + "]";
-
-                // Add icon button
-                uiCommandBuilder.append(rowSelector, ICON_PICKER_ITEM_UI);
-                uiCommandBuilder.set(iconSelector + " #IconButton.Text", icon.getDisplayName());
-
-                // Highlight selected icon
-                if (icon.getFileName().equals(currentIcon)) {
-                    //uiCommandBuilder.set(iconSelector + " #IconButton.Background", "#3a7bd5(0.6)");
-                }
-
-                // Add event binding
-                uiEventBuilder.addEventBinding(
-                        CustomUIEventBindingType.Activating,
-                        iconSelector + " #IconButton",
-                        new EventData()
-                                .append("Action", "Select")
-                                .append("IconFileName", icon.getFileName()),
-                        false
-                );
-
-                // Add spacing between icons
-                if (col < iconsPerRow - 1 && iconIndex < totalIcons - 1) {
-                    uiCommandBuilder.append(rowSelector, ICON_SPACER_UI);
-                }
-            }
+            // Append the icon item
+            uiCommandBuilder.append(ICON_LIST_REF, ICON_PICKER_ITEM_UI);
+            
+            // Set the button text to the icon name
+            uiCommandBuilder.set(iconSelector + " #IconButton.Text", icon.getDisplayName());
+            
+            // Append the icon image to the icon container
+            String iconFileName = icon.getFileName().replace(".png", "");
+            uiCommandBuilder.append(iconSelector + " #IconContainer", "Pages/Icons/Icon" + iconFileName + ".ui");
+            
+            // Add event binding for this icon button
+            uiEventBuilder.addEventBinding(
+                    CustomUIEventBindingType.Activating,
+                    iconSelector + " #IconButton",
+                    new EventData()
+                            .append("Action", "Select")
+                            .append("IconFileName", icon.getFileName()),
+                    false
+            );
         }
 
         // Add event binding for Back button

@@ -38,7 +38,7 @@ Group {
 
   Group {
     LayoutMode: Left;
-    Anchor: (Height: 38);
+    Anchor: (Height: 44);
 
     Label {
       Text: "Icon:";
@@ -46,10 +46,21 @@ Group {
       Style: (FontSize: 15, TextColor: #96a9be, VerticalAlignment: Center, RenderBold: true);
     }
 
-    DropdownBox #IconDropdown {
+    Label #SelectedIconLabel {
+      Text: "Coordinate";
       FlexWeight: 1;
-      Anchor: (Height: 38);
-      Style: $C.@DefaultDropdownBoxStyle;
+      Anchor: (Height: 40);
+      Padding: (Horizontal: 12);
+      Background: #0f1621;
+      Style: (FontSize: 14, TextColor: #ffffff, VerticalAlignment: Center);
+    }
+
+    Group { Anchor: (Width: 12); }
+
+    TextButton #ChooseIconButton {
+      Text: "CHOOSE";
+      Anchor: (Width: 100, Height: 40);
+      Style: $C.@SecondaryTextButtonStyle;
     }
   }
 

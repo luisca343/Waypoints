@@ -6,6 +6,12 @@ Group {
   Background: #1e2836(0.9);
   Padding: (Left: 16, Right: 16, Top: 10, Bottom: 10);
 
+  Group #IconContainer {
+    Anchor: (Width: 44, Height: 44);
+  }
+
+  Group { Anchor: (Width: 12); }
+
   Group {
     FlexWeight: 1;
     LayoutMode: Top;

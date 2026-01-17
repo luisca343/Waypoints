@@ -1,18 +1,21 @@
 $C = "../Common.ui";
 
-@IconButtonStyle = TextButtonStyle(
-  Default: (Background: #1e2836(0.9), LabelStyle: (FontSize: 14, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
-  Hovered: (Background: #2a3a4a(0.95), LabelStyle: (FontSize: 14, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
-  Pressed: (Background: #0f1621, LabelStyle: (FontSize: 14, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center))
-);
-
 Group {
-  LayoutMode: Top;
-  Anchor: (Width: 120);
+  LayoutMode: Left;
+  Anchor: (Height: 50);
+  Background: #1e2836(0.9);
+  Padding: (Full: 8);
+
+  Group #IconContainer {
+    Anchor: (Width: 44, Height: 44);
+  }
+
+  Group { Anchor: (Width: 12); }
 
   TextButton #IconButton {
-    Text: "Icon";
-    Anchor: (Height: 50);
-    Style: @IconButtonStyle;
+    Text: "Icon Name";
+    FlexWeight: 1;
+    Anchor: (Height: 44);
+    Style: $C.@DefaultTextButtonStyle;
   }
 }
