@@ -92,7 +92,10 @@ public class WaypointPage extends InteractiveCustomUIPage<WaypointPage.WaypointP
 
             uiCommandBuilder.set(selector + " #WaypointName.Text", waypointName);
             uiCommandBuilder.set(selector + " #WaypointCoordinates.Text", coordinatesText);
-            //uiCommandBuilder.set(selector + " #WaypointIcon.Background.TexturePath", Constants.ICON_PATH_PREFIX + waypointIcon);
+            
+            // Append the correct icon component to the icon container
+            String iconFileName = waypointIcon.replace(".png", "");
+            uiCommandBuilder.append(selector + " #IconContainer", "Pages/Icons/Icon" + iconFileName + ".ui");
 
             System.out.println("Waypoint: " + waypointName + " at " + coordinatesText + " with icon " +  Constants.ICON_PATH_PREFIX + waypointIcon);
 

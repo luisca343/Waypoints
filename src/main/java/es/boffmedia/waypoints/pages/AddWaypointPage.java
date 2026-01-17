@@ -73,6 +73,9 @@ public class AddWaypointPage extends InteractiveCustomUIPage<AddWaypointPage.Add
     public void build(@Nonnull Ref<EntityStore> ref, @Nonnull UICommandBuilder uiCommandBuilder, @Nonnull UIEventBuilder uiEventBuilder, @Nonnull Store<EntityStore> store) {
         uiCommandBuilder.append("Pages/AddWaypointPage.ui");
 
+        // Add icon dropdown field
+        uiCommandBuilder.append("#IconDropdownContainer", "Pages/IconDropdownField.ui");
+
         // Get player's current position to pre-fill coordinates
         Player player = store.getComponent(ref, Player.getComponentType());
         TransformComponent transformComponent = store.getComponent(player.getReference(), TransformComponent.getComponentType());

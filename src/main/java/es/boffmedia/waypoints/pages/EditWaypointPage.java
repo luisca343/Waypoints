@@ -73,6 +73,9 @@ public class EditWaypointPage extends InteractiveCustomUIPage<EditWaypointPage.E
     public void build(@Nonnull Ref<EntityStore> ref, @Nonnull UICommandBuilder uiCommandBuilder, @Nonnull UIEventBuilder uiEventBuilder, @Nonnull Store<EntityStore> store) {
         uiCommandBuilder.append("Pages/EditWaypointPage.ui");
 
+        // Add icon dropdown field
+        uiCommandBuilder.append("#IconDropdownContainer", "Pages/IconDropdownField.ui");
+
         // Pre-fill with current waypoint data
         Position position = waypoint.transform.position;
 
