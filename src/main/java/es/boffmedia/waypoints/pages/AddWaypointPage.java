@@ -27,6 +27,7 @@ import com.hypixel.hytale.server.core.universe.world.worldmap.WorldMapManager;
 import com.hypixel.hytale.server.core.ui.DropdownEntryInfo;
 import es.boffmedia.waypoints.Constants;
 import es.boffmedia.waypoints.Icons;
+import es.boffmedia.waypoints.util.UIHelpers;
 
 import javax.annotation.Nonnull;
 
@@ -87,19 +88,7 @@ public class AddWaypointPage extends InteractiveCustomUIPage<AddWaypointPage.Add
         uiCommandBuilder.set("#ZInput.Value", String.format("%.2f", position.z));
 
         // Populate icon dropdown
-        java.util.List<Icons.Icon> icons = Icons.getDefaultIcons();
-        DropdownEntryInfo[] iconEntries = new DropdownEntryInfo[icons.size()];
-        int selectedIndex = 0;
-        for (int i = 0; i < icons.size(); i++) {
-            Icons.Icon icon = icons.get(i);
-            iconEntries[i] = new DropdownEntryInfo(LocalizableString.fromString(icon.getDisplayName()), Constants.ICON_PATH_PREFIX + icon.getFileName());
-            if (icon.getFileName().equals(selectedIcon)) {
-                selectedIndex = i;
-            }
-        }
-        uiCommandBuilder.set("#IconDropdown.Entries", iconEntries);
-        // Set default icon to Home
-        uiCommandBuilder.set("#IconDropdown.Value", Constants.ICON_PATH_PREFIX + selectedIcon);
+        UIHelpers.populateIconDropdown(uiCommandBuilder, selectedIcon);
 
         // Add event binding for Add button
         uiEventBuilder.addEventBinding(
