@@ -78,7 +78,6 @@ public class WaypointPage extends InteractiveCustomUIPage<WaypointPage.WaypointP
         int i = 0;
 
         for (WaypointWithDistance waypointData : waypointsWithDistance) {
-            System.out.println("Processing waypoint: " + waypointData.waypoint.name);
 
             String selector = "#WaypointsList[" + i + "]";
             uiCommandBuilder.append(WAYPOINTS_LIST_REF, WAYPOINT_ITEM_UI);
@@ -96,8 +95,6 @@ public class WaypointPage extends InteractiveCustomUIPage<WaypointPage.WaypointP
             // Append the correct icon component to the icon container
             String iconFileName = waypointIcon.replace(".png", "");
             uiCommandBuilder.append(selector + " #IconContainer", "Pages/Icons/Icon" + iconFileName + ".ui");
-
-            System.out.println("Waypoint: " + waypointName + " at " + coordinatesText + " with icon " +  Constants.ICON_PATH_PREFIX + waypointIcon);
 
             // Show/hide TP button based on permission
             uiCommandBuilder.set(selector + " #TeleportButton.Visible", canTeleport);
