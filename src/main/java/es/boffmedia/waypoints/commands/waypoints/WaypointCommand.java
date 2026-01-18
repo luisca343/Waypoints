@@ -2,6 +2,8 @@ package es.boffmedia.waypoints.commands.waypoints;
 
 import com.hypixel.hytale.protocol.GameMode;
 import com.hypixel.hytale.protocol.packets.worldmap.MapMarker;
+import com.hypixel.hytale.server.core.Message;
+import es.boffmedia.waypoints.Constants;
 import com.hypixel.hytale.server.core.command.system.basecommands.AbstractPlayerCommand;
 import com.hypixel.hytale.server.core.command.system.CommandContext;
 import com.hypixel.hytale.server.core.entity.entities.Player;
@@ -28,6 +30,10 @@ public class WaypointCommand extends AbstractPlayerCommand {
     @Override
     protected void execute(@Nonnull CommandContext commandContext, @Nonnull Store<EntityStore> store, @Nonnull Ref<EntityStore> ref, @Nonnull PlayerRef playerRef, @Nonnull World world) {
         Player sender = commandContext.senderAs(Player.class);
+        if (!sender.hasPermission(Constants.PERMISSION_WAYPOINT_OPEN, true)) {
+            sender.sendMessage(Message.raw("You do not have permission to use this command."));
+            return;
+        }
         PlayerWorldData perWorldData = sender.getPlayerConfigData().getPerWorldData(world.getName());
         MapMarker[] waypoints = perWorldData.getWorldMapMarkers();
 

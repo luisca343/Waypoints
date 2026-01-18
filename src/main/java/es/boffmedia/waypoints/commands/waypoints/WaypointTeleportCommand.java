@@ -5,6 +5,7 @@ import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.math.vector.Vector3d;
 import com.hypixel.hytale.math.vector.Vector3f;
 import com.hypixel.hytale.protocol.GameMode;
+import es.boffmedia.waypoints.Constants;
 import com.hypixel.hytale.protocol.packets.worldmap.MapMarker;
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.command.system.CommandContext;
@@ -26,7 +27,7 @@ public class WaypointTeleportCommand extends AbstractPlayerCommand {
     public WaypointTeleportCommand() {
         super("teleport", "Teleport to a waypoint");
         this.nameArg = withRequiredArg("name", "The waypoint name", (ArgumentType) ArgTypes.STRING);
-        setPermissionGroups("waypoints.teleport", GameMode.Creative.toString());
+        setPermissionGroups(Constants.PERMISSION_WAYPOINT_TELEPORT, GameMode.Creative.toString());
     }
 
     @Override

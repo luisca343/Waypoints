@@ -33,11 +33,18 @@ Each waypoint shows three buttons:
 
 ## Permissions
 
-*   `waypoints.teleport` - Required to see and use the teleport button (Creative mode gets this automatically)
+- `boffmedia.waypoints.command.waypoint` — Access to the `/waypoint` UI. Granted by default; server admins can revoke or grant access.
+- `boffmedia.waypoints.command.teleport` — Required to use the teleport command/button.
 
 ### Granting Permissions
 
-*   **On servers**: Use `/perm user add [YOUR_UUID] boffmedia.waypoints.command.teleport` to grant teleport command access
+*   **On servers**: Example commands to manage these permissions:
+
+```
+/perm group add Default -boffmedia.waypoints.command.waypoint    # revoke UI access from Default (Using "-" to deny permission)
+/perm user add <UUID> boffmedia.waypoints.command.waypoint      # grant UI access to a player
+/perm user add <UUID> boffmedia.waypoints.command.teleport      # grant teleport permission to a player
+```
 *   **On singleplayer**: Run `/op self` to grant yourself permissions
 
 ## Commands

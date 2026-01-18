@@ -61,8 +61,8 @@ public class WaypointPage extends InteractiveCustomUIPage<WaypointPage.WaypointP
         Position playerPosition = transformComponent.getSentTransform().position;
 
         // Check if player can teleport (has permission or is in creative)
-        boolean canTeleport = player.hasPermission("waypoints.teleport")
-                || player.getGameMode() == GameMode.Creative;
+        boolean canTeleport = player.hasPermission(Constants.PERMISSION_WAYPOINT_TELEPORT)
+            || player.getGameMode() == GameMode.Creative;
 
         // Calculate distances and create sorted list
         java.util.List<WaypointWithDistance> waypointsWithDistance = new java.util.ArrayList<>();
