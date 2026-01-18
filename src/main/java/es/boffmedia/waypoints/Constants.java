@@ -8,4 +8,7 @@ public class Constants {
 
     // Permission node required to see/use the teleport button
     public static final String PERMISSION_WAYPOINT_TELEPORT = "waypoints.command.teleport";
+    
+    // Default maximum waypoints value. Use -1 to indicate unlimited.
+    public static final int DEFAULT_MAX_WAYPOINTS = -1;
 }

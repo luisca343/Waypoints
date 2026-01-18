@@ -1,6 +1,5 @@
 package es.boffmedia.waypoints.pages;
 
-import com.hypixel.hytale.builtin.buildertools.tooloperations.transform.Translate;
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
@@ -18,19 +17,16 @@ import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.entity.entities.player.data.PlayerWorldData;
 import com.hypixel.hytale.server.core.entity.entities.player.pages.InteractiveCustomUIPage;
 import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
-import com.hypixel.hytale.server.core.ui.LocalizableString;
 import com.hypixel.hytale.server.core.ui.builder.EventData;
 import com.hypixel.hytale.server.core.ui.builder.UICommandBuilder;
 import com.hypixel.hytale.server.core.ui.builder.UIEventBuilder;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.core.universe.world.worldmap.WorldMapManager;
-import com.hypixel.hytale.server.core.ui.DropdownEntryInfo;
 import com.hypixel.hytale.server.core.util.Config;
 import es.boffmedia.waypoints.Constants;
 import es.boffmedia.waypoints.Icons;
 import es.boffmedia.waypoints.config.WaypointsConfig;
-import es.boffmedia.waypoints.util.UIHelpers;
 
 import javax.annotation.Nonnull;
 
@@ -169,7 +165,7 @@ public class AddWaypointPage extends InteractiveCustomUIPage<AddWaypointPage.Add
                 MapMarker[] existingMarkers = perWorldDataCheck.getWorldMapMarkers();
                 
                 int maxWaypoints = config.get().getMaxWaypoints();
-                if (maxWaypoints > 0 && existingMarkers != null && existingMarkers.length >= maxWaypoints) {
+                if (maxWaypoints != Constants.DEFAULT_MAX_WAYPOINTS && existingMarkers != null && existingMarkers.length >= maxWaypoints) {
                     player.sendMessage(Message.raw("Error: You have reached the maximum number of waypoints (" + maxWaypoints + ")."));
                     return;
                 }

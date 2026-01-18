@@ -52,6 +52,25 @@ Each waypoint shows three buttons:
 *   `/waypoint` or `/wp` - Opens the waypoint UI
 *   `/teleport [name]` - Teleport to a waypoint by name
 
+## Configuration
+
+This plugin writes and reads a configuration file so server operators can control behavior.
+
+- **Config file:** `mods/Bofffmedia_Waypoints/waypoints_config.json` (created under your world save at `user_data/saves/<world>/mods/Bofffmedia_Waypoints/`)
+- **Setting:** `MaxWaypoints` (integer, default `-1`)
+	- `-1` means unlimited waypoints per player per world.
+	- Any non-negative integer sets the maximum number of waypoints a player may create in a single world.
+
+Example generated config:
+
+```
+{
+	"MaxWaypoints": -1
+}
+```
+
+After changing the config file, restart the world or reload the mod so the new value is applied.
+
 ## TODO
 
 *   Allow users to add their own icons

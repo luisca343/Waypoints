@@ -3,6 +3,7 @@ package es.boffmedia.waypoints.config;
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
+import es.boffmedia.waypoints.Constants;
 
 /**
  * Configuration class for Waypoints plugin
@@ -12,9 +13,9 @@ public class WaypointsConfig {
     
     /**
      * Maximum number of waypoints a player can create per world
-     * 0 = unlimited
+     * Use {@link Constants#DEFAULT_MAX_WAYPOINTS} for the default (unlimited sentinel)
      */
-    private int maxWaypoints = 0;
+    private int maxWaypoints = Constants.DEFAULT_MAX_WAYPOINTS;
 
     /**
      * Codec for serializing and deserializing the configuration
@@ -31,7 +32,7 @@ public class WaypointsConfig {
 
     /**
      * Get the maximum number of waypoints allowed per world
-     * @return Maximum waypoints (0 = unlimited)
+     * @return Maximum waypoints (use {@link Constants#DEFAULT_MAX_WAYPOINTS} for unlimited)
      */
     public int getMaxWaypoints() {
         return maxWaypoints;
