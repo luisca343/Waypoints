@@ -22,8 +22,10 @@ import com.hypixel.hytale.server.core.ui.builder.UIEventBuilder;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.core.ui.DropdownEntryInfo;
+import com.hypixel.hytale.server.core.util.Config;
 import es.boffmedia.waypoints.Constants;
 import es.boffmedia.waypoints.Icons;
+import es.boffmedia.waypoints.config.WaypointsConfig;
 import es.boffmedia.waypoints.util.UIHelpers;
 
 import javax.annotation.Nonnull;
@@ -31,6 +33,7 @@ import javax.annotation.Nonnull;
 public class EditWaypointPage extends InteractiveCustomUIPage<EditWaypointPage.EditWaypointPageData> {
 
     private final MapMarker waypoint;
+    private final Config<WaypointsConfig> config;
     private String selectedIcon;
     private String selectedIconDisplayName;
     private String savedName = null;
@@ -62,9 +65,10 @@ public class EditWaypointPage extends InteractiveCustomUIPage<EditWaypointPage.E
                 .build();
     }
 
-    public EditWaypointPage(@Nonnull PlayerRef playerRef, MapMarker waypoint) {
+    public EditWaypointPage(@Nonnull PlayerRef playerRef, MapMarker waypoint, Config<WaypointsConfig> config) {
         super(playerRef, CustomPageLifetime.CanDismiss, EditWaypointPageData.CODEC);
         this.waypoint = waypoint;
+        this.config = config;
         this.selectedIcon = waypoint.markerImage;
         // Find display name for current icon
         this.selectedIconDisplayName = "Unknown";
@@ -216,7 +220,7 @@ public class EditWaypointPage extends InteractiveCustomUIPage<EditWaypointPage.E
                     player.sendMessage(Message.raw("Waypoint updated successfully: " + data.name));
 
                     // Return to waypoint list
-                    player.getPageManager().openCustomPage(ref, store, new WaypointPage(playerRef, updatedMarkers.toArray(new MapMarker[0])));
+                    player.getPageManager().openCustomPage(ref, store, new WaypointPage(playerRef, updatedMarkers.toArray(new MapMarker[0]), config));
 
                 } catch (NumberFormatException e) {
                     player.sendMessage(Message.raw("Error: Invalid coordinates. Please enter valid numbers."));
@@ -230,7 +234,7 @@ public class EditWaypointPage extends InteractiveCustomUIPage<EditWaypointPage.E
                         player.getPlayerConfigData().getPerWorldData(worldName);
                 MapMarker[] markers = perWorldData.getWorldMapMarkers();
                 
-                player.getPageManager().openCustomPage(ref, store, new WaypointPage(playerRef, markers != null ? markers : new MapMarker[0]));
+                player.getPageManager().openCustomPage(ref, store, new WaypointPage(playerRef, markers != null ? markers : new MapMarker[0], config));
                 break;
 
             default:

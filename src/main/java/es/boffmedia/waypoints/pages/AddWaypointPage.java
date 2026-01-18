@@ -15,6 +15,7 @@ import com.hypixel.hytale.protocol.packets.worldmap.ContextMenuItem;
 import com.hypixel.hytale.protocol.packets.worldmap.MapMarker;
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.entity.entities.Player;
+import com.hypixel.hytale.server.core.entity.entities.player.data.PlayerWorldData;
 import com.hypixel.hytale.server.core.entity.entities.player.pages.InteractiveCustomUIPage;
 import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
 import com.hypixel.hytale.server.core.ui.LocalizableString;
@@ -25,14 +26,17 @@ import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.core.universe.world.worldmap.WorldMapManager;
 import com.hypixel.hytale.server.core.ui.DropdownEntryInfo;
+import com.hypixel.hytale.server.core.util.Config;
 import es.boffmedia.waypoints.Constants;
 import es.boffmedia.waypoints.Icons;
+import es.boffmedia.waypoints.config.WaypointsConfig;
 import es.boffmedia.waypoints.util.UIHelpers;
 
 import javax.annotation.Nonnull;
 
 public class AddWaypointPage extends InteractiveCustomUIPage<AddWaypointPage.AddWaypointPageData> {
 
+    private final Config<WaypointsConfig> config;
     private String selectedIcon = "Coordinate.png";
     private String selectedIconDisplayName = "Coordinate";
     private String savedName = null;
@@ -64,8 +68,9 @@ public class AddWaypointPage extends InteractiveCustomUIPage<AddWaypointPage.Add
                 .build();
     }
 
-    public AddWaypointPage(@Nonnull PlayerRef playerRef) {
+    public AddWaypointPage(@Nonnull PlayerRef playerRef, Config<WaypointsConfig> config) {
         super(playerRef, CustomPageLifetime.CanDismiss, AddWaypointPageData.CODEC);
+        this.config = config;
     }
 
     public void setSelectedIcon(String iconFileName) {
@@ -157,6 +162,18 @@ public class AddWaypointPage extends InteractiveCustomUIPage<AddWaypointPage.Add
                     return;
                 }
 
+                // Check max waypoints limit
+                String worldNameCheck = player.getWorld().getName();
+                PlayerWorldData perWorldDataCheck =
+                        player.getPlayerConfigData().getPerWorldData(worldNameCheck);
+                MapMarker[] existingMarkers = perWorldDataCheck.getWorldMapMarkers();
+                
+                int maxWaypoints = config.get().getMaxWaypoints();
+                if (maxWaypoints > 0 && existingMarkers != null && existingMarkers.length >= maxWaypoints) {
+                    player.sendMessage(Message.raw("Error: You have reached the maximum number of waypoints (" + maxWaypoints + ")."));
+                    return;
+                }
+
                 try {
                     // Parse coordinates
                     float x = Float.parseFloat(data.x);
@@ -186,7 +203,7 @@ public class AddWaypointPage extends InteractiveCustomUIPage<AddWaypointPage.Add
                             player.getPlayerConfigData().getPerWorldData(worldName);
                     MapMarker[] markers = perWorldData.getWorldMapMarkers();
                     
-                    player.getPageManager().openCustomPage(ref, store, new WaypointPage(playerRef, markers != null ? markers : new MapMarker[0]));
+                    player.getPageManager().openCustomPage(ref, store, new WaypointPage(playerRef, markers != null ? markers : new MapMarker[0], config));
 
                 } catch (NumberFormatException e) {
                     player.sendMessage(Message.raw("Error: Invalid coordinates. Please enter valid numbers. Coordinates sent: X=" + data.x + ", Y=" + data.y + ", Z=" + data.z));
@@ -200,7 +217,7 @@ public class AddWaypointPage extends InteractiveCustomUIPage<AddWaypointPage.Add
                         player.getPlayerConfigData().getPerWorldData(worldName);
                 MapMarker[] markers = perWorldData.getWorldMapMarkers();
                 
-                player.getPageManager().openCustomPage(ref, store, new WaypointPage(playerRef, markers != null ? markers : new MapMarker[0]));
+                player.getPageManager().openCustomPage(ref, store, new WaypointPage(playerRef, markers != null ? markers : new MapMarker[0], config));
                 break;
 
             default:

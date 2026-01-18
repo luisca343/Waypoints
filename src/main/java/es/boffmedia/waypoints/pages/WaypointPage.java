@@ -9,7 +9,6 @@ import com.hypixel.hytale.protocol.GameMode;
 import com.hypixel.hytale.protocol.packets.interface_.CustomPageLifetime;
 import com.hypixel.hytale.protocol.packets.interface_.CustomUIEventBindingType;
 import com.hypixel.hytale.protocol.packets.worldmap.MapMarker;
-import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.entity.entities.player.pages.InteractiveCustomUIPage;
 import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
@@ -19,12 +18,15 @@ import com.hypixel.hytale.server.core.ui.builder.UIEventBuilder;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.protocol.Position;
+import com.hypixel.hytale.server.core.util.Config;
 import es.boffmedia.waypoints.Constants;
+import es.boffmedia.waypoints.config.WaypointsConfig;
 
 import javax.annotation.Nonnull;
 
 public class WaypointPage extends InteractiveCustomUIPage<WaypointPage.WaypointPageData> {
     private final MapMarker[] waypoints;
+    private final Config<WaypointsConfig> config;
     private final String WAYPOINTS_LIST_REF = "#WaypointsList";
     private final String WAYPOINT_ITEM_UI = "Pages/WaypointItem.ui";
 
@@ -41,9 +43,10 @@ public class WaypointPage extends InteractiveCustomUIPage<WaypointPage.WaypointP
                 .build();
     }
 
-    public WaypointPage(@Nonnull PlayerRef playerRef, MapMarker[] waypoints) {
+    public WaypointPage(@Nonnull PlayerRef playerRef, MapMarker[] waypoints, Config<WaypointsConfig> config) {
         super(playerRef, CustomPageLifetime.CanDismiss, WaypointPageData.CODEC);
         this.waypoints = waypoints;
+        this.config = config;
     }
 
     @Override
@@ -228,7 +231,7 @@ public class WaypointPage extends InteractiveCustomUIPage<WaypointPage.WaypointP
                     }
 
                     // Open edit page
-                    player.getPageManager().openCustomPage(ref, store, new EditWaypointPage(playerRef, waypointToEdit));
+                    player.getPageManager().openCustomPage(ref, store, new EditWaypointPage(playerRef, waypointToEdit, config));
                 }
                 break;
             case "Remove":
@@ -263,11 +266,11 @@ public class WaypointPage extends InteractiveCustomUIPage<WaypointPage.WaypointP
                     perWorldData.setWorldMapMarkers(updatedMarkers.toArray(new MapMarker[0]));
                     player.sendMessage(com.hypixel.hytale.server.core.Message.raw("Waypoint removed successfully."));
                     // Optionally refresh the page
-                    player.getPageManager().openCustomPage(ref, store, new WaypointPage(playerRef, updatedMarkers.toArray(new MapMarker[0])));
+                    player.getPageManager().openCustomPage(ref, store, new WaypointPage(playerRef, updatedMarkers.toArray(new MapMarker[0]), config));
                 }
                 break;
             case "Create":
-                player.getPageManager().openCustomPage(ref, store, new AddWaypointPage(playerRef));
+                player.getPageManager().openCustomPage(ref, store, new AddWaypointPage(playerRef, config));
                 break;
             default:
                 break;
