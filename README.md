@@ -11,6 +11,7 @@ A waypoint management system for Hytale with an in-game UI.
 *   **Auto-sorting** - Waypoints are sorted by distance, closest first
 *   **Teleportation** - Optional teleport button (Creative mode or with permission)
 *   **Map markers** - Waypoints appear on your in-game map
+*   **Coordinates HUD** - Toggle a HUD display showing your current coordinates in real-time
 
 ## Usage
 
@@ -31,25 +32,32 @@ Each waypoint shows three buttons:
 
 ![Waypoint edit view](https://i.imgur.com/zLlJpmr.jpeg)
 
+### Coordinates HUD
+
+Toggle the coordinates HUD with `/waypoint togglehud` or `/waypoint hud`. This displays your current X, Y, Z coordinates in the top-right corner of your screen in real-time.
+
 ## Permissions
 
-- `boffmedia.waypoints.command.waypoint` — Access to the `/waypoint` UI. Granted by default; server admins can revoke or grant access.
-- `boffmedia.waypoints.command.teleport` — Required to use the teleport command/button.
+- `waypoints.command.waypoint` — Access to the `/waypoint` UI. Granted by default; server admins can revoke or grant access.
+- `waypoints.command.teleport` — Required to use the teleport command/button.
+- `waypoints.command.hud` — Permission to toggle the coordinates HUD.
 
 ### Granting Permissions
 
 *   **On servers**: Example commands to manage these permissions:
 
 ```
-/perm group add Default -boffmedia.waypoints.command.waypoint    # revoke UI access from Default (Using "-" to deny permission)
-/perm user add <UUID> boffmedia.waypoints.command.waypoint      # grant UI access to a player
-/perm user add <UUID> boffmedia.waypoints.command.teleport      # grant teleport permission to a player
+/perm group add Default -waypoints.command.waypoint    # revoke UI access from Default (Using "-" to deny permission)
+/perm user add <UUID> waypoints.command.waypoint      # grant UI access to a player
+/perm user add <UUID> waypoints.command.teleport      # grant teleport permission to a player
+/perm user add <UUID> waypoints.command.hud           # grant HUD toggle permission to a player
 ```
 *   **On singleplayer**: Run `/op self` to grant yourself permissions
 
 ## Commands
 
 *   `/waypoint` or `/wp` - Opens the waypoint UI
+*   `/waypoint togglehud` or `/waypoint hud` - Toggle the coordinates HUD display
 *   `/teleport [name]` - Teleport to a waypoint by name
 
 ## Configuration
@@ -75,5 +83,6 @@ After changing the config file, restart the world or reload the mod so the new v
 
 *   Allow users to add their own icons
 *   Translations
+*   Persist HUD state across sessions
 
 _Questions or suggestions? Feel free to drop a comment below!_

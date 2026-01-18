@@ -1,0 +1,10 @@
+Group {
+    Anchor: (Top: 10, Right: 10, Width: 200, Height: 40);
+    Background: #00000088;
+    Padding: (Full: 8);
+    
+    Label #CoordinateText {
+        Text: "X: 0.0  Y: 0.0  Z: 0.0";
+        Style: (FontSize: 14, TextColor: #FFFFFF, HorizontalAlignment: Center, VerticalAlignment: Center);
+    }
+}
