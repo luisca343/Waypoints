@@ -33,17 +33,43 @@ Each waypoint shows three buttons:
 
 ## Permissions
 
-*   `waypoints.teleport` - Required to see and use the teleport button (Creative mode gets this automatically)
+- `boffmedia.waypoints.command.waypoint` — Access to the `/waypoint` UI. Granted by default; server admins can revoke or grant access.
+- `boffmedia.waypoints.command.teleport` — Required to use the teleport command/button.
 
 ### Granting Permissions
 
-*   **On servers**: Use `/perm user add [YOUR_UUID] boffmedia.waypoints.command.teleport` to grant teleport command access
+*   **On servers**: Example commands to manage these permissions:
+
+```
+/perm group add Default -boffmedia.waypoints.command.waypoint    # revoke UI access from Default (Using "-" to deny permission)
+/perm user add <UUID> boffmedia.waypoints.command.waypoint      # grant UI access to a player
+/perm user add <UUID> boffmedia.waypoints.command.teleport      # grant teleport permission to a player
+```
 *   **On singleplayer**: Run `/op self` to grant yourself permissions
 
 ## Commands
 
 *   `/waypoint` or `/wp` - Opens the waypoint UI
 *   `/teleport [name]` - Teleport to a waypoint by name
+
+## Configuration
+
+This plugin writes and reads a configuration file so server operators can control behavior.
+
+- **Config file:** `mods/Bofffmedia_Waypoints/waypoints_config.json` (created under your world save at `user_data/saves/<world>/mods/Bofffmedia_Waypoints/`)
+- **Setting:** `MaxWaypoints` (integer, default `-1`)
+	- `-1` means unlimited waypoints per player per world.
+	- Any non-negative integer sets the maximum number of waypoints a player may create in a single world.
+
+Example generated config:
+
+```
+{
+	"MaxWaypoints": -1
+}
+```
+
+After changing the config file, restart the world or reload the mod so the new value is applied.
 
 ## TODO
 
