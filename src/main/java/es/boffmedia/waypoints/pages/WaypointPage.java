@@ -21,6 +21,7 @@ import com.hypixel.hytale.protocol.Position;
 import com.hypixel.hytale.server.core.util.Config;
 import es.boffmedia.waypoints.Constants;
 import es.boffmedia.waypoints.config.WaypointsConfig;
+import es.boffmedia.waypoints.util.PermissionsUtil;
 
 import javax.annotation.Nonnull;
 
@@ -63,9 +64,8 @@ public class WaypointPage extends InteractiveCustomUIPage<WaypointPage.WaypointP
         TransformComponent transformComponent = store.getComponent(player.getReference(), TransformComponent.getComponentType());
         Position playerPosition = transformComponent.getSentTransform().position;
 
-        // Check if player can teleport (has permission or is in creative)
-        boolean canTeleport = player.hasPermission(Constants.PERMISSION_WAYPOINT_TELEPORT)
-            || player.getGameMode() == GameMode.Creative;
+        // Check if player can teleport using the new utility
+        boolean canTeleport = PermissionsUtil.canTeleport(player);
 
         // Calculate distances and create sorted list
         java.util.List<WaypointWithDistance> waypointsWithDistance = new java.util.ArrayList<>();

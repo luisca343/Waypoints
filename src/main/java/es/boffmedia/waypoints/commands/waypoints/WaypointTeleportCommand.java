@@ -6,6 +6,7 @@ import com.hypixel.hytale.math.vector.Vector3d;
 import com.hypixel.hytale.math.vector.Vector3f;
 import com.hypixel.hytale.protocol.GameMode;
 import es.boffmedia.waypoints.Constants;
+import es.boffmedia.waypoints.util.PermissionsUtil;
 import com.hypixel.hytale.protocol.packets.worldmap.MapMarker;
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.command.system.CommandContext;
@@ -27,7 +28,7 @@ public class WaypointTeleportCommand extends AbstractPlayerCommand {
     public WaypointTeleportCommand() {
         super("teleport", "Teleport to a waypoint");
         this.nameArg = withRequiredArg("name", "The waypoint name", (ArgumentType) ArgTypes.STRING);
-        setPermissionGroups(Constants.PERMISSION_WAYPOINT_TELEPORT, GameMode.Creative.toString());
+        // Permission check is done manually in execute() using PermissionsUtil
     }
 
     @Override
@@ -52,6 +53,12 @@ public class WaypointTeleportCommand extends AbstractPlayerCommand {
             Player player = store.getComponent(playerEntityRef, Player.getComponentType());
             if (player == null) {
                 commandContext.sendMessage(Message.raw("Could not access player data!"));
+                return;
+            }
+
+            // Check permission using the new utility
+            if (!PermissionsUtil.canTeleport(player)) {
+                commandContext.sendMessage(Message.raw("You do not have permission to teleport to waypoints."));
                 return;
             }
 
