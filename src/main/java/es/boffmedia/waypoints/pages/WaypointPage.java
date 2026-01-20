@@ -22,14 +22,17 @@ import com.hypixel.hytale.server.core.util.Config;
 import es.boffmedia.waypoints.Constants;
 import es.boffmedia.waypoints.config.WaypointsConfig;
 import es.boffmedia.waypoints.util.PermissionsUtil;
+import es.boffmedia.waypoints.IconNames;
 
 import javax.annotation.Nonnull;
+import java.util.Set;
 
 public class WaypointPage extends InteractiveCustomUIPage<WaypointPage.WaypointPageData> {
     private final MapMarker[] waypoints;
     private final Config<WaypointsConfig> config;
     private final String WAYPOINTS_LIST_REF = "#WaypointsList";
     private final String WAYPOINT_ITEM_UI = "Pages/WaypointItem.ui";
+    
 
     public static class WaypointPageData {
         public String action;
@@ -94,10 +97,10 @@ public class WaypointPage extends InteractiveCustomUIPage<WaypointPage.WaypointP
 
             uiCommandBuilder.set(selector + " #WaypointName.Text", waypointName);
             uiCommandBuilder.set(selector + " #WaypointCoordinates.Text", coordinatesText);
-            
-            // Append the correct icon component to the icon container
-            String iconFileName = waypointIcon.replace(".png", "");
-            uiCommandBuilder.append(selector + " #IconContainer", "Pages/Icons/Icon" + iconFileName + ".ui");
+
+            String iconUiPath = IconNames.resolveIconUiPath(waypointIcon);
+            uiCommandBuilder.append(selector + " #IconContainer", iconUiPath);
+
 
             // Show/hide TP button based on permission
             uiCommandBuilder.set(selector + " #TeleportButton.Visible", canTeleport);

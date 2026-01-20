@@ -15,6 +15,7 @@ import com.hypixel.hytale.server.core.ui.builder.UIEventBuilder;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import es.boffmedia.waypoints.Icons;
+import es.boffmedia.waypoints.IconNames;
 
 import javax.annotation.Nonnull;
 
@@ -63,8 +64,7 @@ public class IconPickerPage extends InteractiveCustomUIPage<IconPickerPage.IconP
             uiCommandBuilder.set(iconSelector + " #IconButton.Text", icon.getDisplayName());
             
             // Append the icon image to the icon container
-            String iconFileName = icon.getFileName().replace(".png", "");
-            uiCommandBuilder.append(iconSelector + " #IconContainer", "Pages/Icons/Icon" + iconFileName + ".ui");
+            uiCommandBuilder.append(iconSelector + " #IconContainer", IconNames.resolveIconUiPath(icon.getFileName()));
             
             // Add event binding for this icon button
             uiEventBuilder.addEventBinding(
