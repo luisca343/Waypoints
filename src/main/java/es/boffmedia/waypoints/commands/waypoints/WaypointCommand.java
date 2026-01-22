@@ -29,7 +29,7 @@ public class WaypointCommand extends AbstractPlayerCommand {
         this.config = config;
         addSubCommand(new AddWaypointCommand());
         addSubCommand(new RemoveWaypointCommand());
-        addAliases("wp", "waypoints");
+        addAliases("wpm","wp", "waypoints");
         setPermissionGroup(GameMode.Adventure);
     }
 
