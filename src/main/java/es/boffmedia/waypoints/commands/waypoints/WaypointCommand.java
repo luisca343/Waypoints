@@ -25,11 +25,11 @@ public class WaypointCommand extends AbstractPlayerCommand {
     private final Config<WaypointsConfig> config;
 
     public WaypointCommand(Config<WaypointsConfig> config) {
-        super("waypoint", "Parent command for marker operations");
+        super("wpm", "Parent command for marker operations");
         this.config = config;
         addSubCommand(new AddWaypointCommand());
         addSubCommand(new RemoveWaypointCommand());
-        addAliases("wpm","wp", "waypoints");
+        addAliases("waypoint","wp", "waypoints");
         setPermissionGroup(GameMode.Adventure);
     }
 
