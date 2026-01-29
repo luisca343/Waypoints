@@ -1,153 +1,152 @@
 $C = "../Common.ui";
 
-Group {
-  Anchor: (Width: 500, Height: 400);
-  Background: #1a1a2e(0.96);
-  LayoutMode: Top;
-  Padding: (Full: 24);
+$C.@PageOverlay {
+    $C.@DecoratedContainer {
+        Anchor: (Width: 500, Height: 400);
 
-  Label #Title {
-    Text: "EDIT WAYPOINT";
-    Anchor: (Height: 44);
-    Style: (FontSize: 22, TextColor: #ffffff, HorizontalAlignment: Center, RenderBold: true);
-  }
+        #Title { $C.@Title { @Text = "EDIT WAYPOINT"; } }
 
-  Group { Anchor: (Height: 2); Background: #3a7bd5; }
-  Group { Anchor: (Height: 20); }
+        #Content {
+            LayoutMode: Top;
+            Padding: (Full: 24);
 
-  Group {
-    LayoutMode: Left;
-    Anchor: (Height: 44);
+            Group { Anchor: (Height: 20); }
 
-    Label {
-      Text: "Name:";
-      Anchor: (Width: 80);
-      Style: (FontSize: 15, TextColor: #96a9be, VerticalAlignment: Center, RenderBold: true);
+            Group {
+                LayoutMode: Left;
+                Anchor: (Height: 44);
+
+                Label {
+                    Text: "Name:";
+                    Anchor: (Width: 80);
+                    Style: (FontSize: 15, TextColor: #96a9be, VerticalAlignment: Center, RenderBold: true);
+                }
+
+                TextField #WaypointNameInput {
+                    FlexWeight: 1;
+                    Anchor: (Height: 40);
+                    Padding: (Horizontal: 12);
+                    Background: #0f1621;
+                    PlaceholderText: "Enter waypoint name...";
+                }
+            }
+
+            Group { Anchor: (Height: 16); }
+
+            Group {
+                LayoutMode: Left;
+                Anchor: (Height: 44);
+
+                Label {
+                    Text: "Icon:";
+                    Anchor: (Width: 80);
+                    Style: (FontSize: 15, TextColor: #96a9be, VerticalAlignment: Center, RenderBold: true);
+                }
+
+                Label #SelectedIconLabel {
+                    Text: "Coordinate";
+                    FlexWeight: 1;
+                    Anchor: (Height: 40);
+                    Padding: (Horizontal: 12);
+                    Background: #0f1621;
+                    Style: (FontSize: 14, TextColor: #ffffff, VerticalAlignment: Center);
+                }
+
+                Group { Anchor: (Width: 12); }
+
+                TextButton #ChooseIconButton {
+                    Text: "CHOOSE";
+                    Anchor: (Width: 100, Height: 40);
+                    Style: $C.@SecondaryTextButtonStyle;
+                }
+            }
+
+            Group { Anchor: (Height: 16); }
+
+            Group {
+                LayoutMode: Left;
+                Anchor: (Height: 44);
+
+                Label {
+                    Text: "X:";
+                    Anchor: (Width: 40);
+                    Style: (FontSize: 15, TextColor: #96a9be, VerticalAlignment: Center, RenderBold: true);
+                }
+
+                TextField #XInput {
+                    FlexWeight: 1;
+                    Anchor: (Height: 40);
+                    Padding: (Horizontal: 12);
+                    Background: #0f1621;
+                    PlaceholderText: "0";
+                }
+
+                Group { Anchor: (Width: 12); }
+
+                Label {
+                    Text: "Y:";
+                    Anchor: (Width: 40);
+                    Style: (FontSize: 15, TextColor: #96a9be, VerticalAlignment: Center, RenderBold: true);
+                }
+
+                TextField #YInput {
+                    FlexWeight: 1;
+                    Anchor: (Height: 40);
+                    Padding: (Horizontal: 12);
+                    Background: #0f1621;
+                    PlaceholderText: "0";
+                }
+
+                Group { Anchor: (Width: 12); }
+
+                Label {
+                    Text: "Z:";
+                    Anchor: (Width: 40);
+                    Style: (FontSize: 15, TextColor: #96a9be, VerticalAlignment: Center, RenderBold: true);
+                }
+
+                TextField #ZInput {
+                    FlexWeight: 1;
+                    Anchor: (Height: 40);
+                    Padding: (Horizontal: 12);
+                    Background: #0f1621;
+                    PlaceholderText: "0";
+                }
+            }
+
+            Group { Anchor: (Height: 16); }
+
+            Label #Error {
+                Text: "";
+                Anchor: (Height: 24);
+                Visible: false;
+                Style: (FontSize: 13, TextColor: #ff6b6b, HorizontalAlignment: Center, RenderBold: true);
+            }
+
+            Group { FlexWeight: 1; }
+
+            Group {
+                LayoutMode: Left;
+                Anchor: (Height: 44);
+
+                Group { FlexWeight: 1; }
+
+                TextButton #SaveButton {
+                    Text: "SAVE";
+                    Anchor: (Width: 110, Height: 40);
+                    Style: $C.@DefaultTextButtonStyle;
+                }
+
+                Group { Anchor: (Width: 16); }
+
+                TextButton #CancelButton {
+                    Text: "CANCEL";
+                    Anchor: (Width: 110, Height: 40);
+                    Style: $C.@CancelTextButtonStyle;
+                }
+
+                Group { FlexWeight: 1; }
+            }
+        }
     }
-
-    TextField #WaypointNameInput {
-      FlexWeight: 1;
-      Anchor: (Height: 40);
-      Padding: (Horizontal: 12);
-      Background: #0f1621;
-      PlaceholderText: "Enter waypoint name...";
-    }
-  }
-
-  Group { Anchor: (Height: 16); }
-
-  Group {
-    LayoutMode: Left;
-    Anchor: (Height: 44);
-
-    Label {
-      Text: "Icon:";
-      Anchor: (Width: 80);
-      Style: (FontSize: 15, TextColor: #96a9be, VerticalAlignment: Center, RenderBold: true);
-    }
-
-    Label #SelectedIconLabel {
-      Text: "Coordinate";
-      FlexWeight: 1;
-      Anchor: (Height: 40);
-      Padding: (Horizontal: 12);
-      Background: #0f1621;
-      Style: (FontSize: 14, TextColor: #ffffff, VerticalAlignment: Center);
-    }
-
-    Group { Anchor: (Width: 12); }
-
-    TextButton #ChooseIconButton {
-      Text: "CHOOSE";
-      Anchor: (Width: 100, Height: 40);
-      Style: $C.@SecondaryTextButtonStyle;
-    }
-  }
-
-  Group { Anchor: (Height: 16); }
-
-  Group {
-    LayoutMode: Left;
-    Anchor: (Height: 44);
-
-    Label {
-      Text: "X:";
-      Anchor: (Width: 40);
-      Style: (FontSize: 15, TextColor: #96a9be, VerticalAlignment: Center, RenderBold: true);
-    }
-
-    TextField #XInput {
-      FlexWeight: 1;
-      Anchor: (Height: 40);
-      Padding: (Horizontal: 12);
-      Background: #0f1621;
-      PlaceholderText: "0";
-    }
-
-    Group { Anchor: (Width: 12); }
-
-    Label {
-      Text: "Y:";
-      Anchor: (Width: 40);
-      Style: (FontSize: 15, TextColor: #96a9be, VerticalAlignment: Center, RenderBold: true);
-    }
-
-    TextField #YInput {
-      FlexWeight: 1;
-      Anchor: (Height: 40);
-      Padding: (Horizontal: 12);
-      Background: #0f1621;
-      PlaceholderText: "0";
-    }
-
-    Group { Anchor: (Width: 12); }
-
-    Label {
-      Text: "Z:";
-      Anchor: (Width: 40);
-      Style: (FontSize: 15, TextColor: #96a9be, VerticalAlignment: Center, RenderBold: true);
-    }
-
-    TextField #ZInput {
-      FlexWeight: 1;
-      Anchor: (Height: 40);
-      Padding: (Horizontal: 12);
-      Background: #0f1621;
-      PlaceholderText: "0";
-    }
-  }
-
-  Group { Anchor: (Height: 16); }
-
-  Label #Error {
-    Text: "";
-    Anchor: (Height: 24);
-    Visible: false;
-    Style: (FontSize: 13, TextColor: #ff6b6b, HorizontalAlignment: Center, RenderBold: true);
-  }
-
-  Group { FlexWeight: 1; }
-
-  Group {
-    LayoutMode: Left;
-    Anchor: (Height: 44);
-
-    Group { FlexWeight: 1; }
-
-    TextButton #SaveButton {
-      Text: "SAVE";
-      Anchor: (Width: 110, Height: 40);
-      Style: $C.@DefaultTextButtonStyle;
-    }
-
-    Group { Anchor: (Width: 16); }
-
-    TextButton #CancelButton {
-      Text: "CANCEL";
-      Anchor: (Width: 110, Height: 40);
-      Style: $C.@CancelTextButtonStyle;
-    }
-
-    Group { FlexWeight: 1; }
-  }
 }

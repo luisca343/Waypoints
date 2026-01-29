@@ -1,33 +1,32 @@
 $C = "../Common.ui";
 
-Group {
-  Anchor: (Width: 500, Height: 450);
-  Background: #1a1a2e(0.96);
-  LayoutMode: Top;
-  Padding: (Full: 24);
+$C.@PageOverlay {
+    $C.@DecoratedContainer {
+        Anchor: (Width: 500, Height: 450);
 
-  Label #Title {
-    Text: "CHOOSE ICON";
-    Anchor: (Height: 44);
-    Style: (FontSize: 22, TextColor: #ffffff, HorizontalAlignment: Center, RenderBold: true);
-  }
+        #Title { $C.@Title { @Text = "CHOOSE ICON"; } }
 
-  Group { Anchor: (Height: 2); Background: #3a7bd5; }
-  Group { Anchor: (Height: 20); }
+        #Content {
+            LayoutMode: Top;
+            Padding: (Full: 24);
 
-  Group #IconList {
-    FlexWeight: 1;
-    LayoutMode: TopScrolling;
-    Background: #0f1621(0.7);
-    Padding: (Full: 8);
-    ScrollbarStyle: $C.@DefaultScrollbarStyle;
-  }
+            Group { Anchor: (Height: 20); }
 
-  Group { Anchor: (Height: 20); }
+            Group #IconList {
+                FlexWeight: 1;
+                LayoutMode: TopScrolling;
+                Background: #0f1621(0.7);
+                Padding: (Full: 8);
+                ScrollbarStyle: $C.@DefaultScrollbarStyle;
+            }
 
-  TextButton #BackButton {
-    Text: "BACK";
-    Anchor: (Height: 44);
-    Style: $C.@SecondaryTextButtonStyle;
-  }
+            Group { Anchor: (Height: 20); }
+
+            TextButton #BackButton {
+                Text: "BACK";
+                Anchor: (Height: 44);
+                Style: $C.@SecondaryTextButtonStyle;
+            }
+        }
+    }
 }

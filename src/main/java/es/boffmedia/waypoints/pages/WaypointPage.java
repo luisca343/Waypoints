@@ -16,6 +16,7 @@ import com.hypixel.hytale.server.core.ui.builder.EventData;
 import com.hypixel.hytale.server.core.ui.builder.UICommandBuilder;
 import com.hypixel.hytale.server.core.ui.builder.UIEventBuilder;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
+import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.protocol.Position;
 import com.hypixel.hytale.server.core.util.Config;
@@ -30,13 +31,18 @@ import java.util.Set;
 public class WaypointPage extends InteractiveCustomUIPage<WaypointPage.WaypointPageData> {
     private final MapMarker[] waypoints;
     private final Config<WaypointsConfig> config;
+    private final String initialQuery;
     private final String WAYPOINTS_LIST_REF = "#WaypointsList";
     private final String WAYPOINT_ITEM_UI = "Pages/WaypointItem.ui";
+    // Simple debounce to avoid processing every single keystroke too rapidly
+    private long lastSearchTimestamp = 0L;
+    private String lastSearchQuery = "";
     
 
     public static class WaypointPageData {
         public String action;
         public String waypointId;
+        public String query;
 
         public static final BuilderCodec<WaypointPageData> CODEC = ((BuilderCodec.Builder<WaypointPageData>) ((BuilderCodec.Builder<WaypointPageData>)
                 BuilderCodec.builder(WaypointPageData.class, WaypointPageData::new))
@@ -44,22 +50,138 @@ public class WaypointPage extends InteractiveCustomUIPage<WaypointPage.WaypointP
                 .add()
                 .append(new KeyedCodec<>("WaypointId", Codec.STRING), (WaypointPageData o, String v) -> o.waypointId = v, (WaypointPageData o) -> o.waypointId)
                 .add())
-                .build();
+                .append(new KeyedCodec<>("@Query", Codec.STRING), (WaypointPageData o, String v) -> o.query = v, (WaypointPageData o) -> o.query)
+                .add()
+            .build();
+    }
+
+    // Refresh only the waypoint list in-place using UICommandBuilder/UIEventBuilder
+    private void refreshWaypoints(@Nonnull Ref<EntityStore> ref, @Nonnull Store<EntityStore> store, MapMarker[] markers, String query) {
+        UICommandBuilder ui = new UICommandBuilder();
+        UIEventBuilder events = new UIEventBuilder();
+
+        ui.clear(WAYPOINTS_LIST_REF);
+
+        // Restore search input value
+        if (query != null) {
+            ui.set("#SearchInput.Value", query);
+        }
+
+        // Player and position
+        Player player = store.getComponent(ref, Player.getComponentType());
+        TransformComponent transformComponent = store.getComponent(player.getReference(), TransformComponent.getComponentType());
+        Position playerPosition = transformComponent.getSentTransform().position;
+
+        boolean canTeleport = PermissionsUtil.canTeleport(player);
+
+        java.util.List<WaypointWithDistance> waypointsWithDistance = new java.util.ArrayList<>();
+        if (markers != null) {
+            for (MapMarker waypoint : markers) {
+                Position waypointPosition = waypoint.transform.position;
+                double distance = calculateDistance(playerPosition, waypointPosition);
+                waypointsWithDistance.add(new WaypointWithDistance(waypoint, distance));
+            }
+        }
+
+        waypointsWithDistance.sort(java.util.Comparator.comparingDouble(w -> w.distance));
+
+        if (waypointsWithDistance.size() == 0) {
+            ui.appendInline(WAYPOINTS_LIST_REF, "Label { Text: \"No waypoints\"; Anchor: (Height: 40); Style: (FontSize: 14, TextColor: #6e7da1, HorizontalAlignment: Center, VerticalAlignment: Center); }");
+            this.sendUpdate(ui, events, false);
+            return;
+        }
+
+        int i = 0;
+        for (WaypointWithDistance waypointData : waypointsWithDistance) {
+            String selector = "#WaypointsList[" + i + "]";
+            ui.append(WAYPOINTS_LIST_REF, WAYPOINT_ITEM_UI);
+
+            String waypointName = waypointData.waypoint.name;
+            String waypointId = waypointData.waypoint.id;
+            String waypointIcon = waypointData.waypoint.markerImage;
+            Position waypointPos = waypointData.waypoint.transform.position;
+            String coordinatesText = String.format("X: %.0f  Y: %.0f  Z: %.0f  -  %.1f blocks away", 
+                waypointPos.x, waypointPos.y, waypointPos.z, waypointData.distance);
+
+            ui.set(selector + " #WaypointName.Text", waypointName);
+            ui.set(selector + " #WaypointCoordinates.Text", coordinatesText);
+
+            String iconUiPath = IconNames.resolveIconUiPath(waypointIcon);
+            ui.append(selector + " #IconContainer", iconUiPath);
+
+            ui.set(selector + " #TeleportButton.Visible", canTeleport);
+
+            if (canTeleport) {
+                events.addEventBinding(
+                        CustomUIEventBindingType.Activating,
+                        selector + " #TeleportButton",
+                        new EventData().append("Action", "Teleport").append("WaypointId", waypointId),
+                        false
+                );
+            }
+
+            events.addEventBinding(
+                    CustomUIEventBindingType.Activating,
+                    selector + " #EditButton",
+                    new EventData().append("Action", "Edit").append("WaypointId", waypointId),
+                    false
+            );
+
+            events.addEventBinding(
+                    CustomUIEventBindingType.Activating,
+                    selector + " #RemoveButton",
+                    new EventData().append("Action", "Remove").append("WaypointId", waypointId),
+                    false
+            );
+
+            i++;
+        }
+
+        // Keep Create button binding (no selector changes needed)
+        events.addEventBinding(
+                CustomUIEventBindingType.Activating,
+                "#CreateWaypointButton",
+                new EventData().append("Action", "Create"),
+                false
+        );
+
+        this.sendUpdate(ui, events, false);
     }
 
     public WaypointPage(@Nonnull PlayerRef playerRef, MapMarker[] waypoints, Config<WaypointsConfig> config) {
+        this(playerRef, waypoints, config, "");
+    }
+
+    public WaypointPage(@Nonnull PlayerRef playerRef, MapMarker[] waypoints, Config<WaypointsConfig> config, String initialQuery) {
         super(playerRef, CustomPageLifetime.CanDismiss, WaypointPageData.CODEC);
         this.waypoints = waypoints;
         this.config = config;
+        this.initialQuery = initialQuery != null ? initialQuery : "";
     }
+
+    
 
     @Override
     public void build(@Nonnull Ref<EntityStore> ref, @Nonnull UICommandBuilder uiCommandBuilder, @Nonnull UIEventBuilder uiEventBuilder, @Nonnull Store<EntityStore> store) {
         uiCommandBuilder.append("Pages/WaypointPage.ui");
         uiCommandBuilder.clear(WAYPOINTS_LIST_REF);
 
+        // Bind search field to trigger server-side filtering
+        // Live typing: send Search action on value changes so list updates while typing
+        uiEventBuilder.addEventBinding(
+            CustomUIEventBindingType.ValueChanged,
+            "#SearchInput",
+            new EventData().append("Action", "Search").append("@Query", "#SearchInput.Value"),
+            false
+        );
+
         if(waypoints.length == 0){
             uiCommandBuilder.appendInline(WAYPOINTS_LIST_REF, "Label { Text: \"No waypoints\"; Anchor: (Height: 40); Style: (FontSize: 14, TextColor: #6e7da1, HorizontalAlignment: Center, VerticalAlignment: Center); }");
+        }
+
+        // Restore search input value so typing doesn't disappear when the page is rebuilt
+        if (this.initialQuery != null && !this.initialQuery.isEmpty()) {
+            uiCommandBuilder.set("#SearchInput.Value", this.initialQuery);
         }
 
         // Get player's current position
@@ -274,6 +396,64 @@ public class WaypointPage extends InteractiveCustomUIPage<WaypointPage.WaypointP
                 break;
             case "Create":
                 player.getPageManager().openCustomPage(ref, store, new AddWaypointPage(playerRef, config));
+                break;
+            case "Search":
+                // Debug: show received query and total waypoints
+                String q = data.query != null ? data.query.trim() : "";
+                // Debounce and skip identical queries to avoid unnecessary work
+                long now = System.currentTimeMillis();
+                if (q.equals(this.lastSearchQuery) && (now - this.lastSearchTimestamp) < 1000) {
+                    break;
+                }
+                this.lastSearchTimestamp = now;
+                this.lastSearchQuery = q;
+
+                // If empty, restore full list from per-world markers (in-place update)
+                if (q.isEmpty()) {
+                    String worldName = player.getWorld().getName();
+                    com.hypixel.hytale.server.core.entity.entities.player.data.PlayerWorldData perWorldData =
+                            player.getPlayerConfigData().getPerWorldData(worldName);
+                    MapMarker[] markers = perWorldData != null ? perWorldData.getWorldMapMarkers() : null;
+                    // debug logging removed
+                    refreshWaypoints(ref, store, markers != null ? markers : new MapMarker[0], "");
+                    break;
+                }
+
+                String qLower = q.toLowerCase();
+                java.util.List<MapMarker> filtered = new java.util.ArrayList<>();
+                for (MapMarker m : this.waypoints) {
+                    String name = m.name != null ? m.name : "";
+                    String id = m.id != null ? m.id : "";
+                    if (name.toLowerCase().contains(qLower) || id.toLowerCase().contains(qLower)) {
+                        filtered.add(m);
+                    }
+                }
+                // debug logging removed
+
+                // If the filtered results are identical to the currently-displayed list (by id and order), skip reopening
+                boolean sameAsCurrent = false;
+                if (this.waypoints != null && this.waypoints.length == filtered.size()) {
+                    sameAsCurrent = true;
+                    for (int idx = 0; idx < filtered.size(); idx++) {
+                        MapMarker fm = filtered.get(idx);
+                        MapMarker cm = this.waypoints[idx];
+                        String fid = fm != null && fm.id != null ? fm.id : "";
+                        String cid = cm != null && cm.id != null ? cm.id : "";
+                        if (!fid.equals(cid)) {
+                            sameAsCurrent = false;
+                            break;
+                        }
+                    }
+                }
+
+                if (sameAsCurrent) {
+                    // results unchanged — skip rebuild to preserve focus
+                    break;
+                }
+
+                MapMarker[] arr = filtered.toArray(new MapMarker[0]);
+                // Update list in-place
+                refreshWaypoints(ref, store, arr, q);
                 break;
             default:
                 break;
