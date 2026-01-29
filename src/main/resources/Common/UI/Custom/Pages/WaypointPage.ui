@@ -1,33 +1,55 @@
 $C = "../Common.ui";
 
-Group {
-    Anchor: (Width: 650, Height: 450);
-    Background: #1a1a2e(0.96);
-    LayoutMode: Top;
-    Padding: (Full: 24);
+$C.@PageOverlay {
+    $C.@DecoratedContainer {
+        Anchor: (Width: 650, Height: 450);
 
-    Label #Title {
-        Text: "WAYPOINTS";
-        Anchor: (Height: 44);
-        Style: (FontSize: 26, TextColor: #ffffff, HorizontalAlignment: Center, RenderBold: true);
-    }
+        #Title { $C.@Title { @Text = "WAYPOINTS"; } }
 
-    Group { Anchor: (Height: 2); Background: #3a7bd5; }
-    Group { Anchor: (Height: 20); }
+        #Content {
+            LayoutMode: Top;
+            Padding: (Full: 24);
 
-    Group #WaypointsList {
-        FlexWeight: 1;
-        LayoutMode: TopScrolling;
-        Background: #0f1621(0.7);
-        Padding: (Full: 8);
-        ScrollbarStyle: $C.@DefaultScrollbarStyle;
-    }
+            Group { Anchor: (Height: 12); }
 
-    Group { Anchor: (Height: 20); }
+            Group {
+                LayoutMode: Left;
+                Anchor: (Height: 44);
 
-    TextButton #CreateWaypointButton {
-        Text: "CREATE WAYPOINT";
-        Anchor: (Height: 44);
-        Style: $C.@DefaultTextButtonStyle;
+                $C.@TextField #SearchInput {
+                    FlexWeight: 1;
+                    Anchor: (Height: 40);
+                    Padding: (Horizontal: 12);
+                    Background: #0f1621;
+                    PlaceholderText: "Search waypoints...";
+                }
+
+                Group { Anchor: (Width: 12); }
+
+                TextButton #SearchApplyButton {
+                    Text: "SEARCH";
+                    Anchor: (Width: 100, Height: 40);
+                    Style: $C.@SecondaryTextButtonStyle;
+                }
+            }
+
+            Group { Anchor: (Height: 12); }
+
+            Group #WaypointsList {
+                FlexWeight: 1;
+                LayoutMode: TopScrolling;
+                Background: #0f1621(0.7);
+                Padding: (Full: 8);
+                ScrollbarStyle: $C.@DefaultScrollbarStyle;
+            }
+
+            Group { Anchor: (Height: 20); }
+
+            TextButton #CreateWaypointButton {
+                Text: "CREATE WAYPOINT";
+                Anchor: (Height: 44);
+                Style: $C.@DefaultTextButtonStyle;
+            }
+        }
     }
 }
