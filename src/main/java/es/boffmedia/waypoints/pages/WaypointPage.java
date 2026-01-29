@@ -166,14 +166,7 @@ public class WaypointPage extends InteractiveCustomUIPage<WaypointPage.WaypointP
         uiCommandBuilder.append("Pages/WaypointPage.ui");
         uiCommandBuilder.clear(WAYPOINTS_LIST_REF);
 
-        // Bind search field and button to trigger server-side filtering
-        uiEventBuilder.addEventBinding(
-            CustomUIEventBindingType.Activating,
-            "#SearchApplyButton",
-            new EventData().append("Action", "Search").append("@Query", "#SearchInput.Value"),
-            false
-        );
-
+        // Bind search field to trigger server-side filtering
         // Live typing: send Search action on value changes so list updates while typing
         uiEventBuilder.addEventBinding(
             CustomUIEventBindingType.ValueChanged,

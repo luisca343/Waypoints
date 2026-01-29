@@ -23,14 +23,6 @@ $C.@PageOverlay {
                     Background: #0f1621;
                     PlaceholderText: "Search waypoints...";
                 }
-
-                Group { Anchor: (Width: 12); }
-
-                TextButton #SearchApplyButton {
-                    Text: "SEARCH";
-                    Anchor: (Width: 100, Height: 40);
-                    Style: $C.@SecondaryTextButtonStyle;
-                }
             }
 
             Group { Anchor: (Height: 12); }
