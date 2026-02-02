@@ -84,6 +84,14 @@ public class IconPickerPage extends InteractiveCustomUIPage<IconPickerPage.IconP
                 new EventData().append("Action", "Back"),
                 false
         );
+
+        // Add event binding for Close (container close button) -> behave like Back
+        uiEventBuilder.addEventBinding(
+            CustomUIEventBindingType.Activating,
+            "#CloseButton",
+            new EventData().append("Action", "Back"),
+            false
+        );
     }
 
     @Override

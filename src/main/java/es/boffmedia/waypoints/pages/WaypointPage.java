@@ -258,6 +258,12 @@ public class WaypointPage extends InteractiveCustomUIPage<WaypointPage.WaypointP
                 new EventData().append("Action", "Create"),
                 false
         );
+        uiEventBuilder.addEventBinding(
+            CustomUIEventBindingType.Activating,
+            "#CloseButton",
+            new EventData().append("Action", "Close"),
+            false
+        );
     }
 
     /**
@@ -454,6 +460,9 @@ public class WaypointPage extends InteractiveCustomUIPage<WaypointPage.WaypointP
                 MapMarker[] arr = filtered.toArray(new MapMarker[0]);
                 // Update list in-place
                 refreshWaypoints(ref, store, arr, q);
+                break;
+            case "Close":
+                this.close();
                 break;
             default:
                 break;
