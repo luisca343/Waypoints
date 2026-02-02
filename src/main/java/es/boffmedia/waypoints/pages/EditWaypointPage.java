@@ -135,6 +135,14 @@ public class EditWaypointPage extends InteractiveCustomUIPage<EditWaypointPage.E
                 new EventData().append("Action", "Cancel"),
                 false
         );
+
+        // Add event binding for Close (container close button) -> behave like Cancel
+        uiEventBuilder.addEventBinding(
+            CustomUIEventBindingType.Activating,
+            "#CloseButton",
+            new EventData().append("Action", "Cancel"),
+            false
+        );
     }
 
     @Override
