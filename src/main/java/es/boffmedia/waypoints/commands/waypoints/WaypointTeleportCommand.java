@@ -73,10 +73,11 @@ public class WaypointTeleportCommand extends AbstractPlayerCommand {
                 return;
             }
 
-            // Find waypoint by name
+            // Find waypoint by name (null-safe)
             MapMarker waypoint = null;
             for (MapMarker marker : markers) {
-                if (marker.name.equalsIgnoreCase(name)) {
+                String mName = marker.name != null ? marker.name : "";
+                if (mName.equalsIgnoreCase(name)) {
                     waypoint = marker;
                     break;
                 }
@@ -97,7 +98,7 @@ public class WaypointTeleportCommand extends AbstractPlayerCommand {
             Teleport teleport = new Teleport(targetPos, rotation);
             store.addComponent(playerEntityRef, Teleport.getComponentType(), teleport);
 
-            commandContext.sendMessage(Message.raw("Teleported to '" + waypoint.name + "'!"));
+            commandContext.sendMessage(Message.raw("Teleported to '" + (waypoint.name != null ? waypoint.name : name) + "'!"));
         });
     }
 }

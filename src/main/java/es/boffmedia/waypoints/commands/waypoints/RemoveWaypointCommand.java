@@ -49,7 +49,8 @@ public class RemoveWaypointCommand extends AbstractPlayerCommand {
         boolean removed = false;
 
         for (MapMarker marker : markers) {
-            if (!marker.name.equalsIgnoreCase(markerName)) {
+            String mName = marker.name != null ? marker.name : "";
+            if (!mName.equalsIgnoreCase(markerName)) {
                 updatedMarkers.add(marker);
             } else {
                 removed = true;
