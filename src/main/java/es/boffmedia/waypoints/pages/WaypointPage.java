@@ -13,6 +13,8 @@ import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.entity.entities.player.pages.InteractiveCustomUIPage;
 import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
 import com.hypixel.hytale.server.core.ui.builder.EventData;
+import com.hypixel.hytale.server.core.ui.LocalizableString;
+import com.hypixel.hytale.server.core.ui.DropdownEntryInfo;
 import com.hypixel.hytale.server.core.ui.builder.UICommandBuilder;
 import com.hypixel.hytale.server.core.ui.builder.UIEventBuilder;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
@@ -37,12 +39,15 @@ public class WaypointPage extends InteractiveCustomUIPage<WaypointPage.WaypointP
     // Simple debounce to avoid processing every single keystroke too rapidly
     private long lastSearchTimestamp = 0L;
     private String lastSearchQuery = "";
+    // current sort mode: "distance" or "name"
+    private String currentSort = "distance";
     
 
     public static class WaypointPageData {
         public String action;
         public String waypointId;
         public String query;
+        public String sort;
 
         public static final BuilderCodec<WaypointPageData> CODEC = ((BuilderCodec.Builder<WaypointPageData>) ((BuilderCodec.Builder<WaypointPageData>)
                 BuilderCodec.builder(WaypointPageData.class, WaypointPageData::new))
@@ -51,6 +56,8 @@ public class WaypointPage extends InteractiveCustomUIPage<WaypointPage.WaypointP
                 .append(new KeyedCodec<>("WaypointId", Codec.STRING), (WaypointPageData o, String v) -> o.waypointId = v, (WaypointPageData o) -> o.waypointId)
                 .add())
                 .append(new KeyedCodec<>("@Query", Codec.STRING), (WaypointPageData o, String v) -> o.query = v, (WaypointPageData o) -> o.query)
+                .add()
+                .append(new KeyedCodec<>("@Sort", Codec.STRING), (WaypointPageData o, String v) -> o.sort = v, (WaypointPageData o) -> o.sort)
                 .add()
             .build();
     }
@@ -83,7 +90,12 @@ public class WaypointPage extends InteractiveCustomUIPage<WaypointPage.WaypointP
             }
         }
 
-        waypointsWithDistance.sort(java.util.Comparator.comparingDouble(w -> w.distance));
+        // Sort according to currentSort
+        if ("name".equalsIgnoreCase(this.currentSort)) {
+            waypointsWithDistance.sort(java.util.Comparator.comparing(w -> w.waypoint.name != null ? w.waypoint.name.toLowerCase() : ""));
+        } else {
+            waypointsWithDistance.sort(java.util.Comparator.comparingDouble(w -> w.distance));
+        }
 
         if (waypointsWithDistance.size() == 0) {
             ui.appendInline(WAYPOINTS_LIST_REF, "Label { Text: \"No waypoints\"; Anchor: (Height: 40); Style: (FontSize: 14, TextColor: #6e7da1, HorizontalAlignment: Center, VerticalAlignment: Center); }");
@@ -175,6 +187,20 @@ public class WaypointPage extends InteractiveCustomUIPage<WaypointPage.WaypointP
             false
         );
 
+        // Populate sort dropdown entries and bind changes
+        DropdownEntryInfo[] sortEntries = new DropdownEntryInfo[]{
+            new DropdownEntryInfo(LocalizableString.fromString("Distance"), "distance"),
+            new DropdownEntryInfo(LocalizableString.fromString("Name"), "name")
+        };
+        uiCommandBuilder.set("#SortDropdown.Entries", sortEntries);
+        uiCommandBuilder.set("#SortDropdown.Value", this.currentSort);
+        uiEventBuilder.addEventBinding(
+            CustomUIEventBindingType.ValueChanged,
+            "#SortDropdown",
+            new EventData().append("Action", "Sort").append("@Sort", "#SortDropdown.Value"),
+            false
+        );
+
         if(waypoints.length == 0){
             uiCommandBuilder.appendInline(WAYPOINTS_LIST_REF, "Label { Text: \"No waypoints\"; Anchor: (Height: 40); Style: (FontSize: 14, TextColor: #6e7da1, HorizontalAlignment: Center, VerticalAlignment: Center); }");
         }
@@ -200,8 +226,16 @@ public class WaypointPage extends InteractiveCustomUIPage<WaypointPage.WaypointP
             waypointsWithDistance.add(new WaypointWithDistance(waypoint, distance));
         }
 
-        // Sort by distance (closest first)
-        waypointsWithDistance.sort(java.util.Comparator.comparingDouble(w -> w.distance));
+        // Sort according to currentSort
+        if ("name".equalsIgnoreCase(this.currentSort)) {
+            waypointsWithDistance.sort(java.util.Comparator.comparing(w -> {
+                String n = w.waypoint.name != null ? w.waypoint.name : "";
+                return n.toLowerCase();
+            }));
+        } else {
+            // default: distance
+            waypointsWithDistance.sort(java.util.Comparator.comparingDouble(w -> w.distance));
+        }
 
         int i = 0;
 
@@ -460,6 +494,16 @@ public class WaypointPage extends InteractiveCustomUIPage<WaypointPage.WaypointP
                 MapMarker[] arr = filtered.toArray(new MapMarker[0]);
                 // Update list in-place
                 refreshWaypoints(ref, store, arr, q);
+                break;
+                case "Sort":
+                String sortMode = data.sort != null ? data.sort : "distance";
+                this.currentSort = sortMode;
+                // Recompute markers from per-world data and refresh
+                String worldNameSort = player.getWorld().getName();
+                com.hypixel.hytale.server.core.entity.entities.player.data.PlayerWorldData perWorldDataSort =
+                    player.getPlayerConfigData().getPerWorldData(worldNameSort);
+                MapMarker[] markersSort = perWorldDataSort != null ? perWorldDataSort.getWorldMapMarkers() : new MapMarker[0];
+                refreshWaypoints(ref, store, markersSort, this.lastSearchQuery != null ? this.lastSearchQuery : "");
                 break;
             case "Close":
                 this.close();

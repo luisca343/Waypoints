@@ -24,6 +24,12 @@ $C.@PageOverlay {
                     Background: #0f1621;
                     PlaceholderText: "Search waypoints...";
                 }
+                Group { Anchor: (Width: 12); }
+
+                DropdownBox #SortDropdown {
+                    Anchor: (Width: 160, Height: 40);
+                    Style: $C.@DefaultDropdownBoxStyle;
+                }
             }
 
             Group { Anchor: (Height: 12); }
